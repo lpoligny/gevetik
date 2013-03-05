@@ -11,4 +11,7 @@ Centraliser l'ensemble des procedures afin que l'organisation d'un évènement n
 
 C'est un site « clé en main » développé en [CakePHP](http://www.cakephp.org).
 
-
+# Installation #
+Pour les tests le dévellopement est fait avec une connexion MySQL avec les paramètres suivants :
+ * utilisateur `gevetik`
+ * Mot Passe `gevetik`
