@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-03-05 12:54:31
+-- Date/time:                    2013-03-14 14:35:31
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 -- Dumping structure for table gevetik.auteur
 CREATE TABLE IF NOT EXISTS `auteur` (
   `auteur_id` int(10) NOT NULL AUTO_INCREMENT,
-  `paiement_id` int(10) NOT NULL,
+  `paiement_id` int(10) DEFAULT NULL,
   `prenom_auteur` varchar(50) NOT NULL,
   `nom_auteur` varchar(50) NOT NULL,
   `email_auteur` varchar(100) NOT NULL,
@@ -67,8 +67,9 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `organisateur_id` int(10) NOT NULL DEFAULT '0',
   `nom_evenement` varchar(50) NOT NULL,
   `remise` int(10) NOT NULL DEFAULT '0',
-  `date_creation` date NOT NULL,
-  `date_evenement` date NOT NULL,
+  `date_remise` date NOT NULL,
+  `date_debut_evenement` date NOT NULL,
+  `date_fin_evenement` date NOT NULL,
   PRIMARY KEY (`evenement_id`),
   KEY `FK_organisateur` (`organisateur_id`),
   CONSTRAINT `FK_organisateur` FOREIGN KEY (`organisateur_id`) REFERENCES `organisateur` (`organisateur_id`)
@@ -139,16 +140,16 @@ CREATE TABLE IF NOT EXISTS `page_payee` (
 -- Dumping structure for table gevetik.paiement
 CREATE TABLE IF NOT EXISTS `paiement` (
   `paiement_id` int(10) NOT NULL AUTO_INCREMENT,
-  `reservation_id` int(10) NOT NULL DEFAULT '0',
-  `auteur_id` int(10) NOT NULL DEFAULT '0',
+  `reservation_id` int(10) DEFAULT '0',
+  `auteur_id` int(10) DEFAULT '0',
   `type` varchar(50) NOT NULL,
   `validation` tinyint(4) NOT NULL DEFAULT '0',
   `total` float(10,2) NOT NULL,
   PRIMARY KEY (`paiement_id`),
   KEY `FK_auteur` (`auteur_id`),
   KEY `FK_reservation` (`reservation_id`),
-  CONSTRAINT `FK_reservation` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`),
-  CONSTRAINT `FK_auteur` FOREIGN KEY (`auteur_id`) REFERENCES `auteur` (`auteur_id`)
+  CONSTRAINT `FK_auteur` FOREIGN KEY (`auteur_id`) REFERENCES `auteur` (`auteur_id`),
+  CONSTRAINT `FK_reservation` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -177,9 +178,9 @@ CREATE TABLE IF NOT EXISTS `reservation` (
   UNIQUE KEY `unique` (`evenement_id`,`participant_id`,`paiement_id`),
   KEY `FK_paiement_reservation` (`paiement_id`),
   KEY `FK_participant_reservation` (`participant_id`),
+  CONSTRAINT `FK_evenement_reservation` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`),
   CONSTRAINT `FK_paiement_reservation` FOREIGN KEY (`paiement_id`) REFERENCES `paiement` (`paiement_id`),
-  CONSTRAINT `FK_participant_reservation` FOREIGN KEY (`participant_id`) REFERENCES `participant` (`participant_id`),
-  CONSTRAINT `FK_evenement_reservation` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`)
+  CONSTRAINT `FK_participant_reservation` FOREIGN KEY (`participant_id`) REFERENCES `participant` (`participant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
