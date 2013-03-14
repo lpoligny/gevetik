@@ -21,6 +21,41 @@
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+ 
+ /**
+  *http://book.cakephp.org/2.0/en/development/routing.html
+  */	
+	
+	/**
+	 * Route d'accès en admin
+	 */
+	Router::connect('/admin/:action/*', 
+					array(
+						//'controller' => 'evenements', 
+						));
+	
+	/**
+	 * Route d'accès pour le service financier
+	 */
+	Router::connect('/finance/:action/*', 
+					array(
+						//'controller' => 'evenements', 
+						));
+	
+	/**
+	 * Route d'accès aux evènements
+	 */
+	Router::connect('/:nom_evenement/', 
+					array(
+						'controller' => 'evenements', 
+						'action' => 'index',
+						));
+	
+	Router::connect('/:nom_evenement/:action/*', 
+					array(
+						'controller' => 'evenements', 
+						));
+	
 /**
  * Here, we are connecting '/' (base path) to controller called 'Pages',
  * its action called 'display', and we pass a param to select the view file
