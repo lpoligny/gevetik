@@ -16,6 +16,9 @@ class Participant extends AppModel{
 				'Reservation' => array(
 								'className' => 'Reservation',
 								),
+				'Evenement' => array(
+								'className' => 'Evenement',
+								),
 				);
 				
 	/**

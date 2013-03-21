@@ -15,6 +15,7 @@ class Evenement extends AppModel{
 	public $hasOne = array(
 				'Organisateur' => array(
 								'className' => 'Participant',
+								'foreignKey' => 'participant_id',
 								),
 				);
 	

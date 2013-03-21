@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-03-21 13:49:17
+-- Date/time:                    2013-03-21 15:50:53
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `evenement_id` int(10) NOT NULL AUTO_INCREMENT,
   `organisateur_id` int(10) NOT NULL DEFAULT '0',
   `nom_evenement` varchar(50) NOT NULL,
-  `description` date NOT NULL,
+  `description` text NOT NULL,
   `remise` int(10) NOT NULL DEFAULT '0',
   `date_remise` date NOT NULL,
   `date_soumission_debut` date NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `date_fin` date NOT NULL,
   PRIMARY KEY (`evenement_id`),
   KEY `FK_organisateur` (`organisateur_id`),
-  CONSTRAINT `FK_organisateur` FOREIGN KEY (`organisateur_id`) REFERENCES `organisateur` (`organisateur_id`)
+  CONSTRAINT `FK_evenement_participant` FOREIGN KEY (`organisateur_id`) REFERENCES `participant` (`participant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `page_payee` (
   UNIQUE KEY `unique` (`article_id`,`auteur_id`),
   KEY `FK_auteur_page_payee` (`auteur_id`),
   CONSTRAINT `FK_article_page_payee` FOREIGN KEY (`article_id`) REFERENCES `article` (`article_id`),
-  CONSTRAINT `FK_auteur_page_payee` FOREIGN KEY (`auteur_id`) REFERENCES `auteur` (`auteur_id`)
+  CONSTRAINT `FK_auteur_page_payee` FOREIGN KEY (`auteur_id`) REFERENCES `participant` (`participant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
