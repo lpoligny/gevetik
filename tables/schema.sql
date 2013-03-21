@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-03-14 14:35:31
+-- Date/time:                    2013-03-21 13:49:17
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -32,22 +32,6 @@ CREATE TABLE IF NOT EXISTS `article` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table gevetik.auteur
-CREATE TABLE IF NOT EXISTS `auteur` (
-  `auteur_id` int(10) NOT NULL AUTO_INCREMENT,
-  `paiement_id` int(10) DEFAULT NULL,
-  `prenom_auteur` varchar(50) NOT NULL,
-  `nom_auteur` varchar(50) NOT NULL,
-  `email_auteur` varchar(100) NOT NULL,
-  PRIMARY KEY (`auteur_id`),
-  UNIQUE KEY `unique` (`email_auteur`),
-  KEY `FK_paiement_auteur` (`paiement_id`),
-  CONSTRAINT `FK_paiement_auteur` FOREIGN KEY (`paiement_id`) REFERENCES `paiement` (`paiement_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
 -- Dumping structure for table gevetik.categorie
 CREATE TABLE IF NOT EXISTS `categorie` (
   `categorie_id` int(10) NOT NULL AUTO_INCREMENT,
@@ -66,13 +50,30 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `evenement_id` int(10) NOT NULL AUTO_INCREMENT,
   `organisateur_id` int(10) NOT NULL DEFAULT '0',
   `nom_evenement` varchar(50) NOT NULL,
+  `description` date NOT NULL,
   `remise` int(10) NOT NULL DEFAULT '0',
   `date_remise` date NOT NULL,
-  `date_debut_evenement` date NOT NULL,
-  `date_fin_evenement` date NOT NULL,
+  `date_soumission_debut` date NOT NULL,
+  `date_soumission_fin` date NOT NULL,
+  `date_acceptation` date NOT NULL,
+  `date_acceptation_definitive` date NOT NULL,
+  `date_debut` date NOT NULL,
+  `date_fin` date NOT NULL,
   PRIMARY KEY (`evenement_id`),
   KEY `FK_organisateur` (`organisateur_id`),
   CONSTRAINT `FK_organisateur` FOREIGN KEY (`organisateur_id`) REFERENCES `organisateur` (`organisateur_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table gevetik.gestionnaire_finances
+CREATE TABLE IF NOT EXISTS `gestionnaire_finances` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `login` varchar(50) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique` (`login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -110,27 +111,17 @@ CREATE TABLE IF NOT EXISTS `option_paiement` (
 -- Data exporting was unselected.
 
 
--- Dumping structure for table gevetik.organisateur
-CREATE TABLE IF NOT EXISTS `organisateur` (
-  `organisateur_id` int(10) NOT NULL AUTO_INCREMENT,
-  `prenom_organisateur` varchar(50) NOT NULL,
-  `nom_organisateur` varchar(50) NOT NULL,
-  `email_organisateur` varchar(100) NOT NULL,
-  PRIMARY KEY (`organisateur_id`),
-  UNIQUE KEY `unique` (`email_organisateur`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-
-
 -- Dumping structure for table gevetik.page_payee
 CREATE TABLE IF NOT EXISTS `page_payee` (
+  `page_payee_id` int(10) NOT NULL AUTO_INCREMENT,
   `article_id` int(10) NOT NULL,
   `auteur_id` int(10) NOT NULL,
+  `paiement_id` int(10) NOT NULL,
   `extra_page_payee` int(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`article_id`,`auteur_id`),
+  PRIMARY KEY (`page_payee_id`),
+  UNIQUE KEY `unique` (`article_id`,`auteur_id`),
   KEY `FK_auteur_page_payee` (`auteur_id`),
-  CONSTRAINT `FK_article` FOREIGN KEY (`article_id`) REFERENCES `article` (`article_id`),
+  CONSTRAINT `FK_article_page_payee` FOREIGN KEY (`article_id`) REFERENCES `article` (`article_id`),
   CONSTRAINT `FK_auteur_page_payee` FOREIGN KEY (`auteur_id`) REFERENCES `auteur` (`auteur_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -140,16 +131,14 @@ CREATE TABLE IF NOT EXISTS `page_payee` (
 -- Dumping structure for table gevetik.paiement
 CREATE TABLE IF NOT EXISTS `paiement` (
   `paiement_id` int(10) NOT NULL AUTO_INCREMENT,
-  `reservation_id` int(10) DEFAULT '0',
-  `auteur_id` int(10) DEFAULT '0',
+  `reference_paiement` varchar(50) NOT NULL,
+  `page_payee_id` int(10) NOT NULL DEFAULT '0',
+  `reservation_id` int(10) NOT NULL DEFAULT '0',
   `type` varchar(50) NOT NULL,
   `validation` tinyint(4) NOT NULL DEFAULT '0',
   `total` float(10,2) NOT NULL,
   PRIMARY KEY (`paiement_id`),
-  KEY `FK_auteur` (`auteur_id`),
-  KEY `FK_reservation` (`reservation_id`),
-  CONSTRAINT `FK_auteur` FOREIGN KEY (`auteur_id`) REFERENCES `auteur` (`auteur_id`),
-  CONSTRAINT `FK_reservation` FOREIGN KEY (`reservation_id`) REFERENCES `reservation` (`reservation_id`)
+  UNIQUE KEY `unique` (`reference_paiement`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -161,6 +150,7 @@ CREATE TABLE IF NOT EXISTS `participant` (
   `prenom_participant` varchar(50) NOT NULL,
   `nom_participant` varchar(50) NOT NULL,
   `email_participant` varchar(100) NOT NULL,
+  `mot_de_passe` varchar(50) NOT NULL,
   PRIMARY KEY (`participant_id`),
   UNIQUE KEY `unique` (`email_participant`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
