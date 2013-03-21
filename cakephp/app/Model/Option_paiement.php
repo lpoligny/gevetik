@@ -6,18 +6,13 @@ class Option_paiement extends AppModel{
 	
 	public $useTable = 'option_paiement';
 	
+	public $primaryKey = 'option_paiement_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $hasOne = array(
-				'Paiement' => array(
-								'className' => 'Paiement',
-								),
-				'Option' => array(
-								'className' => 'Option',
-								),
-				);
+	public $belongsTo = array('Paiement', 'Option');
 				
 	/**
 	 * Définition du comportement du modèle

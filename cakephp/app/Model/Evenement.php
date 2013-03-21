@@ -6,32 +6,27 @@ class Evenement extends AppModel{
 	
 	public $useTable = 'evenement';
 	
+	public $primaryKey = 'evenement_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
 	public $hasOne = array(
 				'Organisateur' => array(
-								'className' => 'Organisateur',
+								'className' => 'Participant',
 								),
-				
 				);
 	
 	public $hasMany = array(
 				'Categorie' => array(
 								'className' => 'Categorie',
-								'order' => 'Evenement.date_creation DESC',
-								'limit' => 10,
-								
+								),
 				'Article' => array(
 								'className' => 'Article',
 								),
-				);
-	
-	public $hasAndBelongsToMany = array(
-				'Participant' => array(
-								'className' => 'Participant',
-								'joinTable' => 'Reservation',
+				'Reservation' => array(
+								'className' => 'Reservation',
 								),
 				);
 				

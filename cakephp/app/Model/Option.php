@@ -6,6 +6,8 @@ class Option extends AppModel{
 	
 	public $useTable = 'option';
 	
+	public $primaryKey = 'option_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
@@ -16,12 +18,12 @@ class Option extends AppModel{
 								),
 				);
 	
-	public $hasAndBelongsToMany = array(
-				'Paiement' => array(
-								'className' => 'Paiement',
-								'joinTable' => 'Option_paiement',
-								),
+	public $hasMany = array(
+				'Option_paiement' => array(
+								'className' => 'Option_paiement',
+								)
 				);
+
 				
 	/**
 	 * Définition du comportement du modèle

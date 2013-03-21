@@ -6,15 +6,15 @@ class Participant extends AppModel{
 	
 	public $useTable = 'participant';
 	
+	public $primaryKey = 'participant_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	
-	public $hasAndBelongsToMany = array(
-				'Evenement' => array(
-								'className' => 'Evenement',
-								'joinTable' => 'Reservation',
+	public $hasMany = array(
+				'Reservation' => array(
+								'className' => 'Reservation',
 								),
 				);
 				
@@ -50,7 +50,7 @@ class Participant extends AppModel{
 											'message' => "Le nom du participant ne peut contenir que des caractères.",
 											),
 								),
-				'email_organisateur' => array(
+				'email_participant' => array(
 								'email' => array(
 											'rule' => array('email'),
 											'message' => "L'email de l'organisateur est invalide.",

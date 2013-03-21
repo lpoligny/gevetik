@@ -6,28 +6,27 @@ class Paiement extends AppModel{
 	
 	public $useTable = 'paiement';
 	
+	public $primaryKey = 'paiement_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
 	public $hasOne = array(
-				'Auteur' => array(
-								'className' => 'Auteur',
+				'Page_payee' => array(
+								'className' => 'Page_payee',
 								),
 				'Reservation' => array(
 								'className' => 'Reservation',
 								),
 				);
 	
-	public $hasAndBelongsToMany = array(
-				'Option' => array(
-								'className' => 'Option',
-								'joinTable' => 'Option_paiement',
-								),
+	public $hasMany = array(
+				'Option_paiement' => array(
+								'className' => 'Option_paiement',
+								)
 				);
-	
-
-				
+		
 	/**
 	 * Définition du comportement du modèle
 	 * http://book.cakephp.org/2.0/en/models/behaviors.html
@@ -63,13 +62,14 @@ class Paiement extends AppModel{
 								),
 				);
 	
-	
+	/*
 	public function beforeSave(){
 		if(empty($this->data['Paiement']['validation']))
 			$this->data['Paiement']['validation'] = false;
 		
 		return true;
 	}
+	*/
 }
 
 ?>

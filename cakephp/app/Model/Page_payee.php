@@ -6,18 +6,13 @@ class Page_payee extends AppModel{
 	
 	public $useTable = 'page_payee';
 	
+	public $primaryKey = 'page_payee_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $hasOne = array(
-				'Article' => array(
-								'className' => 'Article',
-								),
-				'Auteur' => array(
-								'className' => 'Auteur',
-								),
-				);
+	public $belongsTo = array('Article', 'Auteur');
 				
 	/**
 	 * Définition du comportement du modèle

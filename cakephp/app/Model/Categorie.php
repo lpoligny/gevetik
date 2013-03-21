@@ -6,6 +6,8 @@ class Categorie extends AppModel{
 	
 	public $useTable = 'categorie';
 	
+	public $primaryKey = 'categorie_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html

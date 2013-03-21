@@ -6,6 +6,8 @@ class Article extends AppModel{
 	
 	public $useTable = 'article';
 	
+	public $primaryKey = 'article_id';
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
@@ -14,11 +16,14 @@ class Article extends AppModel{
 				'Evenement' => array(
 								'className' => 'Evenement',
 								),
+				);
+
+	public $hasMany = array(
 				'Page_payee' => array(
 								'className' => 'Page_payee',
 								),
 				);
-				
+	
 	/**
 	 * Définition du comportement du modèle
 	 * http://book.cakephp.org/2.0/en/models/behaviors.html
