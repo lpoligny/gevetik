@@ -29,17 +29,17 @@
 	/**
 	 * Route d'accès en admin
 	 */
-	Router::connect('/admin/:action/*', 
+	/*Router::connect('/admin/:action/*', 
 					array(
 						//'controller' => 'evenements', 
-						));
+						));*/
 	
 	/**
 	 * Route d'accès pour le service financier
 	 */
-	Router::connect('/finance/:action/*', 
+	Router::connect('/gestionnaireFinances/:action/*', 
 					array(
-						//'controller' => 'evenements', 
+						'controller' => 'gestionnaireFinances', 
 						));
 	
 	/**

@@ -1,5 +1,5 @@
 <?php
-	//debug($infos);
+	debug($infos);
 	$res = $this -> Form -> create('ValiderPaiements',array('url' => '/gestionnaireFinances/maj_paiements'));
 
 	$res .= "<table>";

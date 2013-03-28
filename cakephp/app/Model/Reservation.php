@@ -12,11 +12,9 @@ class Reservation extends AppModel{
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $hasOne = array(
-						'Paiement' => array('className' => 'Paiement'),
-						); 
+
 	
-	public $belongsTo = array('Evenement','Participant');
+	public $belongsTo = array('Evenement','Participant','Paiement');
 	
 	/**
 	 * Définition du comportement du modèle
