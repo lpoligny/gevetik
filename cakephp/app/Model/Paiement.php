@@ -45,21 +45,7 @@ class Paiement extends AppModel{
 											'message' => 'Le total doit être un nombre.',
 											'allowEmpty' => true,
 											),
-								),
-				'type' => array(
-								'value' => array(
-											'rule' => array('numeric'),
-											'message' => 'La remise doit être un nombre.',
-											'allowEmpty' => true,
-											),
-								),
-				'validation' => array(
-								'boolean' => array(
-											'rule' => array('boolean'),
-											'message' => "Vous devez spécifier si le paiement est validé.",
-											),
-								'allowEmpty' => true,
-								),
+								)
 				);
 	
 	/*
