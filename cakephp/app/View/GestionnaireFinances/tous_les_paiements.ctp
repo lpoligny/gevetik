@@ -1,6 +1,7 @@
 <?php
-	debug($infos);
-	$res = $this -> Form -> create('ValiderPaiements',array('url' => '/gestionnaireFinances/maj_paiements'));
+	//debug($infos);
+	$res = $this -> Html -> link('Paiements en attente de validation','/gestionnaireFinances/paiements_en_attente');
+	$res .= $this -> Form -> create('ValiderPaiements',array('url' => '/gestionnaireFinances/maj_paiements'));
 
 	$res .= "<table>";
 
