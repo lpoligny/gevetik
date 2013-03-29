@@ -99,12 +99,11 @@ class EvenementsController extends AppController {
 			if(array_key_exists('Evenement', $this->request->data)){
 				$this->Evenement->id = $this->request->data['Evenement']['evenement_id'];
 				
-				if($this->Evenement->save($this->request->data)){
+				if($this->Evenement->save($this->request->data))
 					$this->Session->setFlash('Evènement modifié');
-				}
-				else{
+				else
 					$this->Session->setFlash('Echec de la modification l\'évènement');
-				}
+					
 			}
 			else if(array_key_exists('Organisateur', $this->request->data)){
 				switch($this->request->data['Organisateur']['action']){
@@ -116,68 +115,102 @@ class EvenementsController extends AppController {
 						else
 							$this->Session->setFlash("Echec de l'ajout de l'organisateur");
 						break;
-				
+						
+					case 'update':
+						$organisateurs = $this->Organisateur->getOrganisateurs($res['Evenement']['evenement_id']);
+						$success = true;
+						foreach($organisateurs as $organisateur):
+							$organisateur_id = $organisateur['Organisateur']['organisateur_id'];
+							$this->Organisateur->id = $organisateur_id;
+							$data = array(
+									'nom_role' =>  $this->request->data['Organisateur']['nom_role_'.$organisateur_id],
+									);
+							if(!$this->Organisateur->save($data)){
+								$this->Session->setFlash("Echec de l'ajout de l'organisateur");
+								$success = false;
+								break;
+							}
+						endforeach;
+						if($success)
+							$this->Session->setFlash("Role(s) d'organisateur modifié(s)");
+						break;
 				}
+				
 			}
 			else if(array_key_exists('Categorie', $this->request->data)){
 			
-				//ajout d'une catégorie
-				if(array_key_exists('nom_categorie', $this->request->data['Categorie'])):
-					$this->Categorie->create();
-					if($this->Categorie->save($this->request->data)){
-						$this->Session->setFlash('Catégorie ajoutée');
-						$this->redirect($this->here);
-					}
-					else{
-						$this->Session->setFlash('Echec de la modification l\'évènement');
-					}
-				//suppression de catégories
-				elseif(!empty($this->request->data['Categorie'])): 
-					foreach($this->request->data['Categorie'] as $categorie_id):
-						$this->Categorie->delete($categorie_id);
-					endforeach;
+				$this->loadModel('Categorie');
+				switch($this->request->data['Categorie']['action']){
 					
-					$this->Session->setFlash('Catégorie(s) supprimée(s)');
-					$this->redirect($this->here);
-				endif;
+					case 'add'://ajout d'une catégorie
+						$this->Categorie->create();
+						if($this->Categorie->save($this->request->data))
+							$this->Session->setFlash('Catégorie ajoutée');
+						else
+							$this->Session->setFlash("Echec d'ajout de la catégorie");
+						break;
+						
+					case 'delete'://suppression de catégories
+						foreach($this->request->data['Categorie'] as $categorie_id):
+							$this->Categorie->delete($categorie_id);
+						endforeach;
+						
+						$this->Session->setFlash('Catégorie(s) supprimée(s)');
+						break;
+				}
 				
 			}
 			else if(array_key_exists('Option', $this->request->data)){
-				//ajout d'une option
-				if(!array_key_exists('action', $this->request->data['Option'])):
-					$this->Option->create();
-					if($this->Option->save($this->request->data)){
-						$this->Session->setFlash('Option ajouté');
-						$this->redirect($this->here);
-					}
-					else{
-						$this->Session->setFlash('Echec de la modification l\'évènement');
-					}
-				//modification des options
-				elseif($this->request->data['Option']['action']=='update'):
-					foreach($result_options as $option):///////////////////////////////
-						$option_id = $option['Option']['option_id'];
-						$data = array();
-						
-						$this->Option->id = $option_id;
-						$data['nom_option'] = $this->request->data['Option']['nom_option_'.$option_id];
-						$data['prix_unitaire'] = $this->request->data['Option']['prix_unitaire_'.$option_id];
-						$data['quantite_minimum'] = $this->request->data['Option']['quantite_minimum_'.$option_id];
-						$data['quantite_maximum'] = $this->request->data['Option']['quantite_maximum_'.$option_id];
-						
-						// if(!$this->Option->updateAll($data, array('option_id' => $option_id))){
-						if(!$this->Option->save($data)){
-							$this->Session->setFlash('Echec de la modification l\'évènement');
-						}
-					endforeach;
+				
+				switch($this->request->data['Option']['action']){
 					
-					$this->Session->setFlash('Option(s) modifiée(s)');
-					$this->redirect($this->here);
+					case 'add'://ajout d'une option
+						$this->Option->create();
+						if($this->Option->save($this->request->data))
+							$this->Session->setFlash('Option ajouté');
+						else
+							$this->Session->setFlash("Echec d'ajout d'option");
+						break;
 					
-				endif;
+					case 'update'://modification des options
+						$categories = array();
+						foreach($res['Categorie'] as $categorie):
+							$categories[] = $categorie['categorie_id'];
+						endforeach;
+						
+						$options = $this->Option->find('all', array('conditions' => array('Option.categorie_id' => $categories)));
+						debug($this->request->data);
+						foreach($options as $option):
+							$option_id = $option['Option']['option_id'];
+							if(array_key_exists('delete_option_'.$option_id, $this->request->data['Option']))//suppression
+								$this->Option->delete($option_id);
+							else{ // modification
+							
+								$data = array();
+								$this->Option->id = $option_id;
+								$data['nom_option'] = $this->request->data['Option']['nom_option_'.$option_id];
+								$data['prix_unitaire'] = $this->request->data['Option']['prix_unitaire_'.$option_id];
+								$data['quantite_minimum'] = $this->request->data['Option']['quantite_minimum_'.$option_id];
+								$data['quantite_maximum'] = $this->request->data['Option']['quantite_maximum_'.$option_id];
+							
+								if(!$this->Option->save($data)){
+									$this->Session->setFlash('Echec de la modification des options');
+									break;
+								}
+							}
+						endforeach;
+					
+						$this->Session->setFlash('Option(s) modifiée(s)');
+						break;
+				}
 			}
+			
+			//mise à niveau
+			$this->request->data = array();
+			$res = $this->Evenement->find('first', array(
+													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
+													));
         }
-		
 		//récupération des options
 		$options_by_categorie = array();
 		foreach($res['Categorie'] as $categorie):
