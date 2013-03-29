@@ -8,6 +8,12 @@ class Participant extends AppModel{
 	
 	public $primaryKey = 'participant_id';
 	
+	public $displayField = 'nom_complet';
+	
+	public $virtualFields = array(
+				'nom_complet' => "CONCAT(Participant.nom_participant, ' ', Participant.prenom_participant)",
+				);
+	
 	/**
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
@@ -16,8 +22,8 @@ class Participant extends AppModel{
 				'Reservation' => array(
 								'className' => 'Reservation',
 								),
-				'Evenement' => array(
-								'className' => 'Evenement',
+				'Organisateur' => array(
+								'className' => 'Organisateur',
 								),
 				);
 				

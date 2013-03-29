@@ -12,7 +12,7 @@ class Option extends AppModel{
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $hasOne = array(
+	public $belongsTo = array(
 				'Categorie' => array(
 								'className' => 'Categorie',
 								),
@@ -83,6 +83,13 @@ class Option extends AppModel{
 			return false;
 		
 		return true;
+	}
+	
+	public function getOptions($categorie_id){
+		$options = $this->find('all', array(
+										'conditions' => array('Option.categorie_id' => $categorie_id)
+										));
+		return $options;
 	}
 }
 

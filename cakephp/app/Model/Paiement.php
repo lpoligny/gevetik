@@ -12,12 +12,14 @@ class Paiement extends AppModel{
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $hasOne = array(
+	public $belongsTo = array(
 				'Page_payee' => array(
 								'className' => 'Page_payee',
+								'foreignKey' => 'page_payee_id',
 								),
 				'Reservation' => array(
 								'className' => 'Reservation',
+								'foreignKey' => 'reservation_id',
 								),
 				);
 	
@@ -47,15 +49,6 @@ class Paiement extends AppModel{
 											),
 								)
 				);
-	
-	/*
-	public function beforeSave(){
-		if(empty($this->data['Paiement']['validation']))
-			$this->data['Paiement']['validation'] = false;
-		
-		return true;
-	}
-	*/
 }
 
 ?>

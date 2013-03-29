@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-03-21 15:50:53
+-- Date/time:                    2013-03-29 22:22:33
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS `categorie` (
   `evenement_id` int(10) NOT NULL,
   `nom_categorie` varchar(50) NOT NULL,
   PRIMARY KEY (`categorie_id`),
+  UNIQUE KEY `unique` (`nom_categorie`,`evenement_id`),
   KEY `FK_evemement` (`evenement_id`),
-  CONSTRAINT `FK_evemement` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`)
+  CONSTRAINT `FK_evemement` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -48,7 +49,6 @@ CREATE TABLE IF NOT EXISTS `categorie` (
 -- Dumping structure for table gevetik.evenement
 CREATE TABLE IF NOT EXISTS `evenement` (
   `evenement_id` int(10) NOT NULL AUTO_INCREMENT,
-  `organisateur_id` int(10) NOT NULL DEFAULT '0',
   `nom_evenement` varchar(50) NOT NULL,
   `description` text NOT NULL,
   `remise` int(10) NOT NULL DEFAULT '0',
@@ -59,9 +59,7 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `date_acceptation_definitive` date NOT NULL,
   `date_debut` date NOT NULL,
   `date_fin` date NOT NULL,
-  PRIMARY KEY (`evenement_id`),
-  KEY `FK_organisateur` (`organisateur_id`),
-  CONSTRAINT `FK_evenement_participant` FOREIGN KEY (`organisateur_id`) REFERENCES `participant` (`participant_id`)
+  PRIMARY KEY (`evenement_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -88,8 +86,9 @@ CREATE TABLE IF NOT EXISTS `option` (
   `quantite_minimum` int(10) NOT NULL DEFAULT '0',
   `quantite_maximum` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`option_id`),
+  UNIQUE KEY `unique` (`categorie_id`,`nom_option`),
   KEY `FK_categorie` (`categorie_id`),
-  CONSTRAINT `FK_categorie` FOREIGN KEY (`categorie_id`) REFERENCES `categorie` (`categorie_id`)
+  CONSTRAINT `FK_categorie` FOREIGN KEY (`categorie_id`) REFERENCES `categorie` (`categorie_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -106,6 +105,22 @@ CREATE TABLE IF NOT EXISTS `option_paiement` (
   KEY `FK_option_option_paiement` (`option_id`),
   CONSTRAINT `FK_option_option_paiement` FOREIGN KEY (`option_id`) REFERENCES `option` (`option_id`),
   CONSTRAINT `FK_paiement_option_paiement` FOREIGN KEY (`paiement_id`) REFERENCES `paiement` (`paiement_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table gevetik.organisateur
+CREATE TABLE IF NOT EXISTS `organisateur` (
+  `organisateur_id` int(10) NOT NULL AUTO_INCREMENT,
+  `evenement_id` int(10) NOT NULL,
+  `participant_id` int(10) NOT NULL,
+  `nom_role` varchar(50) NOT NULL,
+  PRIMARY KEY (`organisateur_id`),
+  UNIQUE KEY `UNIQUE` (`evenement_id`,`participant_id`),
+  KEY `FK_participant_organisateur` (`participant_id`),
+  CONSTRAINT `FK_evenement_organisateur` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`),
+  CONSTRAINT `FK_participant_organisateur` FOREIGN KEY (`participant_id`) REFERENCES `participant` (`participant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -151,6 +166,7 @@ CREATE TABLE IF NOT EXISTS `participant` (
   `nom_participant` varchar(50) NOT NULL,
   `email_participant` varchar(100) NOT NULL,
   `mot_de_passe` varchar(50) NOT NULL,
+  `profession` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`participant_id`),
   UNIQUE KEY `unique` (`email_participant`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
