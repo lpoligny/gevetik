@@ -29,13 +29,24 @@ class EvenementsController extends AppController {
  * @var string
  */
 	public $name = 'Evenements';
-
+	public $evenementID = 0;
 	public $helpers = array('Html', 'Form');
 	
 	public $uses = array();
 	
 	public $donneeEvenement = '';
 	public $nomEvenement = '';
+
+	public $components = array('Session',
+		                          'Auth' => array(
+		                              'authenticate' => array(
+		                                          'Form' => array(
+		                                              'fields' => array('username' => 'email_participant', 'password' => 'mot_de_passe'),
+		                                              'userModel' => 'Participant',
+		                                              )
+		                                          ),
+		                              )
+		                   	);
 
 	
 	function beforeFilter(){
@@ -53,35 +64,37 @@ class EvenementsController extends AppController {
 				throw new NotFoundException(__('Evenement inconnu'));
 			}	
 			$this->donneeEvenement = $res;
+			$this->evenementID = $res['Evenement']['evenement_id'];
 		}
 	}
 	
 	
-	public function index($v = '') {
-		echo $v;
-		//debug(func_get_args());
-		//$path = func_get_args();
-		debug($this->params['nom_evenement']);
-		//print_r($path);
-		/*
-		$count = count($path);
-		if (!$count) {
-			$this->redirect('/');
-		}
-		$page = $subpage = $title_for_layout = null;
+	public function index() {
+		$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
+		$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
+		$this->set('date_fin_evenement', $this->donneeEvenement['Evenement']['date_fin']);
+		$this->login();
 
-		if (!empty($path[0])) {
-			$page = $path[0];
+	}
+
+	public function login() {
+		$this->logout();
+		$this->loadModel('Participant');
+		$result = $this->Participant->find('all');
+		if ($this->request->is('post')) {
+			if ($this->Auth->login()) {
+				//$this->redirect($this->Auth->redirect());
+				$this->Session->setFlash(__('Connexion OK'));
+				$this->redirect(array('controller' => $this->nomEvenement, 'action' => 'index'));
+			}
+			 else {
+				$this->Session->setFlash(__('Login ou mot de passe incorrect'));
+			}
 		}
-		if (!empty($path[1])) {
-			$subpage = $path[1];
-		}
-		if (!empty($path[$count - 1])) {
-			$title_for_layout = Inflector::humanize($path[$count - 1]);
-		}
-		$this->set(compact('page', 'subpage', 'title_for_layout'));
-		$this->render(implode('/', $path));
-		*/
+	}
+
+	public function logout() {
+		$this->Auth->logout();
 	}
 	
 	public function organisateur(){
@@ -246,16 +259,19 @@ class EvenementsController extends AppController {
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
 
-	public function add() {
+	public function inscription() {
+	$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
+	$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
+	$this->set('date_fin_evenement', $this->donneeEvenement['Evenement']['date_fin']);
 	$this->loadModel('Participant');
 	$result = $this->Participant->find('all');
         if ($this->request->is('post')) {
             $this->Participant->create();
             if ($this->Participant->save($this->request->data)) {
-                $this->Session->setFlash(__('The user has been saved'));
-                $this->redirect(array('action' => 'index'));
+                $this->Session->setFlash(__('Votre inscription a été prise en compte'));
+                $this->redirect(array('controller' => $this->nomEvenement, 'action' => 'index'));
             } else {
-                $this->Session->setFlash(__('The user could not be saved. Please, try again.'));
+                $this->Session->setFlash(__('Votre inscritpion à echoué.'));
             }
         }
 

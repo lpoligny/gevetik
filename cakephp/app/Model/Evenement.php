@@ -200,7 +200,6 @@ class Evenement extends AppModel{
 		
 		return ($date_soumission_debut <= $check_date);
 	}
-
 }
 
 ?>
