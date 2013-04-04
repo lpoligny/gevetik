@@ -1,5 +1,5 @@
 <?php
-
+/** BENJAMIN RABILLER**/
 class Participant extends AppModel{
 
 	public $name = 'Participant';
