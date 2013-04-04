@@ -1,4 +1,5 @@
 <?php
+/** BENJAMIN RABILLER
 /**
  * Static content controller.
  *
