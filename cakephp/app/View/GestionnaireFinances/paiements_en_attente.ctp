@@ -1,4 +1,8 @@
 <?php
+
+
+	// Jonathan
+
 	//debug($infos);
 	$res = $this -> Html -> link('Tous les paiements','/gestionnaireFinances/tous_les_paiements');
 	$res .= $this -> Form -> create('ValiderPaiements',array('url' => '/gestionnaireFinances/maj_paiements'));
