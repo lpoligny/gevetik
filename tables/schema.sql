@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-04-11 17:44:36
+-- Date/time:                    2013-04-12 00:03:59
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `date_acceptation_definitive` date NOT NULL,
   `date_debut` date NOT NULL,
   `date_fin` date NOT NULL,
+  `evenement_active` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`evenement_id`),
   UNIQUE KEY `unique` (`slug_evenement`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

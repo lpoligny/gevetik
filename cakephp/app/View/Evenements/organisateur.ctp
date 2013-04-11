@@ -10,6 +10,16 @@ echo $this->Form->create('Evenement', array('type' => 'post'));
 				'default' => $evenement['nom_evenement'],
 				// 'disabled' => true,
 				));
+	echo $this->Form->input('slug_evenement', array(
+				'label' => "Identifiant de l'évènement",
+				'default' => $evenement['slug_evenement'],
+				));
+	echo $this->Form->checkbox('evenement_active', array(
+					'value' => 1,
+					'checked' => ($evenement['evenement_active']==1),
+					));
+	echo $this->Form->label('evenement_active', 'Rendre visible');
+	
 	echo $this->Form->input('evenement_id', array(
 				'type' => 'hidden',
 				'label' => 'evenement_id',
@@ -21,6 +31,21 @@ echo $this->Form->create('Evenement', array('type' => 'post'));
 				'label' => 'Description',
 				'default' => $evenement['description'],
 				));
+	
+	?>
+	<strong>Utilisez ces balises pour :</strong><br/>
+	<ul>
+		<?php 
+		foreach($evenement['parsable_fields'] as $field => $desc):
+			echo '<li>['.$field.'] - '.$desc.'</li>'."\n";
+		endforeach;
+		?>
+	</ul>
+	
+	<h5>Previsualisation :</h5>
+	<?php 
+	echo '<p>'.$evenement['parsed_description'].'</p>';
+	
 	echo $this->Form->input('date_debut', array(
 				'type' => 'date',
 				'label' => "Date de début de l'évènement",
