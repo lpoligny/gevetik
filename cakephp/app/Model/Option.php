@@ -52,7 +52,7 @@ class Option extends AppModel{
 								),
 				'quantite_maximum' => array(
 								'value' => array(
-											'rule' => array('naturalNumber', false),
+											'rule' => array('naturalNumber', true),
 											'message' => 'La quantité maximum doit être un nombre entier.',
 											'allowEmpty' => true,
 											),

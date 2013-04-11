@@ -44,6 +44,28 @@ class Categorie extends AppModel{
 								),
 				);
 	
+	public function creerCategorie($evenement_id, $nom_categorie){
+		
+		$data = array(
+				'evenement_id' => $evenement_id,
+				'nom_categorie' => $nom_categorie,
+				);
+		$this->create();
+		if(!$this->save($data))
+			return false;
+			
+		//création de l'option entrée
+		$data = array(
+				'categorie_id' => $this->getInsertID(),
+				'nom_option' => 'Entrée',
+				'prix_unitaire' => 0,
+				'quantite_maximum' => 0,
+				'quantite_minimum' => 0,
+				);
+				
+		$this->Option->create();
+		return $this->Option->save($data);
+	}
 	
 }
 
