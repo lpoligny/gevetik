@@ -1,5 +1,6 @@
 <?php
 /**
+ * Matthias POSVITE
  * Static content controller.
  *
  * This file will render views from views/pages/
@@ -34,8 +35,9 @@ class EvenementsController extends AppController {
 	
 	public $uses = array();
 	
-	public $donneeEvenement = '';
+	public $evenementID = 0;
 	public $nomEvenement = '';
+	public $donneeEvenement = '';
 
 	
 	function beforeFilter(){
@@ -52,37 +54,11 @@ class EvenementsController extends AppController {
 			if (!$res) {
 				throw new NotFoundException(__('Evenement inconnu'));
 			}	
+			$this->evenementID = $res['Evenement']['evenement_id'];
 			$this->donneeEvenement = $res;
 		}
 	}
 	
-	
-	public function index($v = '') {
-		echo $v;
-		//debug(func_get_args());
-		//$path = func_get_args();
-		debug($this->params['nom_evenement']);
-		//print_r($path);
-		/*
-		$count = count($path);
-		if (!$count) {
-			$this->redirect('/');
-		}
-		$page = $subpage = $title_for_layout = null;
-
-		if (!empty($path[0])) {
-			$page = $path[0];
-		}
-		if (!empty($path[1])) {
-			$subpage = $path[1];
-		}
-		if (!empty($path[$count - 1])) {
-			$title_for_layout = Inflector::humanize($path[$count - 1]);
-		}
-		$this->set(compact('page', 'subpage', 'title_for_layout'));
-		$this->render(implode('/', $path));
-		*/
-	}
 	
 	public function organisateur(){
 		$this->loadModel('Option');
@@ -117,22 +93,30 @@ class EvenementsController extends AppController {
 						break;
 						
 					case 'update':
-						$organisateurs = $this->Organisateur->getOrganisateurs($res['Evenement']['evenement_id']);
+						$organisateurs = $this->donneeEvenement['Organisateur'];
 						$success = true;
+						
 						foreach($organisateurs as $organisateur):
-							$organisateur_id = $organisateur['Organisateur']['organisateur_id'];
-							$this->Organisateur->id = $organisateur_id;
-							$data = array(
-									'nom_role' =>  $this->request->data['Organisateur']['nom_role_'.$organisateur_id],
-									);
-							if(!$this->Organisateur->save($data)){
-								$this->Session->setFlash("Echec de l'ajout de l'organisateur");
-								$success = false;
-								break;
+							$organisateur_id = $organisateur['organisateur_id'];
+							
+							//Suppression des organisateurs
+							if($this->request->data['Organisateur']['del_organisateur_'.$organisateur_id]==1)
+								$this->Organisateur->delete($organisateur_id);
+							else{
+							//modification des organisateurs
+								$this->Organisateur->id = $organisateur_id;
+								$data = array(
+										'est_organisateur' =>  $this->request->data['Organisateur']['est_organisateur_'.$organisateur_id],
+										);
+								if(!$this->Organisateur->save($data)){
+									$this->Session->setFlash("Echec de la modification de l'organisateur");
+									$success = false;
+									break;
+								}
 							}
 						endforeach;
 						if($success)
-							$this->Session->setFlash("Role(s) d'organisateur modifié(s)");
+							$this->Session->setFlash("Droit d'organisateur modifié(s)");
 						break;
 				}
 				
@@ -144,7 +128,7 @@ class EvenementsController extends AppController {
 					
 					case 'add'://ajout d'une catégorie
 						$this->Categorie->create();
-						if($this->Categorie->save($this->request->data))
+						if($this->Categorie->creerCategorie($this->evenementID, $this->request->data['Categorie']['nom_categorie']))
 							$this->Session->setFlash('Catégorie ajoutée');
 						else
 							$this->Session->setFlash("Echec d'ajout de la catégorie");
@@ -165,42 +149,72 @@ class EvenementsController extends AppController {
 				switch($this->request->data['Option']['action']){
 					
 					case 'add'://ajout d'une option
-						$this->Option->create();
-						if($this->Option->save($this->request->data))
-							$this->Session->setFlash('Option ajouté');
-						else
-							$this->Session->setFlash("Echec d'ajout d'option");
+						
+						$data = array(
+								'nom_option' => $this->request->data['Option']['nom_option'],
+								'prix_unitaire' => 0,
+								'quantite_minimum' => '',
+								'quantite_maximum' => '',
+								);
+						
+						//pour chaque catégorie, création d'une option de même nom
+						foreach($res['Categorie'] as $categorie):
+							$this->Option->create();
+							$data['categorie_id'] = $categorie['categorie_id'];
+							
+							if($this->Option->save($data))
+								$this->Session->setFlash('Option ajouté');
+						endforeach;
 						break;
-					
 					case 'update'://modification des options
+						//récupération des catégorie de l'évènement
 						$categories = array();
 						foreach($res['Categorie'] as $categorie):
 							$categories[] = $categorie['categorie_id'];
 						endforeach;
 						
+						//tri des options par catégorie.
 						$options = $this->Option->find('all', array('conditions' => array('Option.categorie_id' => $categories)));
-						debug($this->request->data);
+						$sorted_options = array();
 						foreach($options as $option):
-							$option_id = $option['Option']['option_id'];
-							if(array_key_exists('delete_option_'.$option_id, $this->request->data['Option']))//suppression
-								$this->Option->delete($option_id);
-							else{ // modification
-							
-								$data = array();
-								$this->Option->id = $option_id;
-								$data['nom_option'] = $this->request->data['Option']['nom_option_'.$option_id];
-								$data['prix_unitaire'] = $this->request->data['Option']['prix_unitaire_'.$option_id];
-								$data['quantite_minimum'] = $this->request->data['Option']['quantite_minimum_'.$option_id];
-								$data['quantite_maximum'] = $this->request->data['Option']['quantite_maximum_'.$option_id];
-							
-								if(!$this->Option->save($data)){
-									$this->Session->setFlash('Echec de la modification des options');
-									break;
+							$sorted_options[$option['Option']['nom_option']][] = $option;
+						endforeach;
+						
+						$success = true;
+						foreach($sorted_options as  $nom_option => $options){
+							foreach($options as  $option){
+								$option_id = $option['Option']['option_id'];
+								
+								//suppression
+								if(array_key_exists('delete_option_'.$nom_option, $this->request->data['Option']))
+									$this->Option->delete($option_id);
+								else{ 
+								// modification
+									$data = array();
+									$data['Option']['nom_option'] = $this->request->data['Option']['nom_option_'.$nom_option];
+									$data['Option']['prix_unitaire'] = $this->request->data['Option']['prix_unitaire_'.$option_id];
+									$data['Option']['quantite_minimum'] = intval($this->request->data['Option']['quantite_minimum_'.$option_id]);
+									$data['Option']['quantite_maximum'] = intval($this->request->data['Option']['quantite_maximum_'.$option_id]);
+									
+									$this->Option->id = $option_id;
+									if(!$this->Option->save($data)){
+										$success = false;
+										//affichage des erreurs
+										$this->Option->set($data);
+										$errors_group = $this->Option->invalidFields();
+										foreach($errors_group as $errors):
+											foreach($errors as $error):
+												$this->Session->setFlash($error);
+											endforeach;
+										endforeach;
+										break;
+									}
 								}
 							}
-						endforeach;
-					
-						$this->Session->setFlash('Option(s) modifiée(s)');
+						}
+						// endforeach;
+						if($success)
+							$this->Session->setFlash('Option(s) modifiée(s)');
 						break;
 				}
 			}
@@ -212,10 +226,22 @@ class EvenementsController extends AppController {
 													));
         }
 		//récupération des options
-		$options_by_categorie = array();
+		// $options_by_categorie = array();
+		$categorie_ids = array();
+		//récupération des identifiants des catégories
 		foreach($res['Categorie'] as $categorie):
-			$options_by_categorie[$categorie['categorie_id']] = $this->Option->getOptions($categorie['categorie_id']);
+			$categorie_ids[] = $categorie['categorie_id'];
+			// $options_by_categorie[$categorie['categorie_id']] = $this->Option->getOptions($categorie['categorie_id']);
 		endforeach;
+		
+		//récupération des options de l'évènement
+		$options = $this->Option->find('all', array('conditions' => array('Categorie.categorie_id' => $categorie_ids)));
+		$sorted_options = array();
+		// debug($options);
+		foreach($options as $option):
+			$sorted_options[$option['Option']['nom_option']][] = $option;
+		endforeach;
+		
 		
 		//récupérations détaillé des organisateurs
 		$organisateurs = $this->Organisateur->getOrganisateurs($res['Evenement']['evenement_id']);
@@ -234,7 +260,8 @@ class EvenementsController extends AppController {
 		$this->set('organisateurs', $organisateurs);
 		$this->set('participants', $participants);
 		$this->set('categories', $res['Categorie']);
-		$this->set('options_by_categorie', $options_by_categorie);
+		// $this->set('options_by_categorie', $options_by_categorie);
+		$this->set('sorted_options', $sorted_options);
 	}
 	
 
