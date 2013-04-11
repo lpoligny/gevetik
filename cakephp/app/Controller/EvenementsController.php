@@ -226,18 +226,16 @@ class EvenementsController extends AppController {
 													));
         }
 		//récupération des options
-		// $options_by_categorie = array();
 		$categorie_ids = array();
 		//récupération des identifiants des catégories
 		foreach($res['Categorie'] as $categorie):
 			$categorie_ids[] = $categorie['categorie_id'];
-			// $options_by_categorie[$categorie['categorie_id']] = $this->Option->getOptions($categorie['categorie_id']);
 		endforeach;
 		
 		//récupération des options de l'évènement
 		$options = $this->Option->find('all', array('conditions' => array('Categorie.categorie_id' => $categorie_ids)));
 		$sorted_options = array();
-		// debug($options);
+		
 		foreach($options as $option):
 			$sorted_options[$option['Option']['nom_option']][] = $option;
 		endforeach;
