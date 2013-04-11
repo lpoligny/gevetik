@@ -47,9 +47,7 @@ class EvenementsController extends AppController {
 		if(array_key_exists('nom_evenement', $params)){
 			$this->nomEvenement = $this->params['nom_evenement'];
 			
-			$res = $this->Evenement->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
-													));
+			$res = $this->Evenement->getEvenement($this->nomEvenement);
 			//si l'évènement n'existe pas										
 			if (!$res) {
 				throw new NotFoundException(__('Evenement inconnu'));
@@ -66,7 +64,6 @@ class EvenementsController extends AppController {
 		$this->loadModel('Organisateur');
 		
 		$res = $this->donneeEvenement;
-		
 		/*
 		 *sauvegarde des modifications
 		 */
@@ -153,8 +150,6 @@ class EvenementsController extends AppController {
 						$data = array(
 								'nom_option' => $this->request->data['Option']['nom_option'],
 								'prix_unitaire' => 0,
-								'quantite_minimum' => '',
-								'quantite_maximum' => '',
 								);
 						
 						//pour chaque catégorie, création d'une option de même nom
@@ -164,6 +159,8 @@ class EvenementsController extends AppController {
 							
 							if($this->Option->save($data))
 								$this->Session->setFlash('Option ajouté');
+							else
+								$this->Session->setFlash("Erreur de création de l'option");
 						endforeach;
 						break;
 					case 'update'://modification des options
@@ -221,9 +218,7 @@ class EvenementsController extends AppController {
 			
 			//mise à niveau
 			$this->request->data = array();
-			$res = $this->Evenement->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
-													));
+			$res = $this->Evenement->getEvenement($this->evenementID);
         }
 		//récupération des options
 		$categorie_ids = array();
