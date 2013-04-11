@@ -160,6 +160,9 @@ class Evenement extends AppModel{
 								),
 				);
 	
+	/*
+	 *Méthodes de validation
+	 */
 	public function validPlanning($check_date, $date_start = ''){
 		$date_debut_evenement = new DateTime($this->data['Evenement']['date_debut']);
 		if(is_array($check_date))
@@ -201,6 +204,66 @@ class Evenement extends AppModel{
 		return ($date_soumission_debut <= $check_date);
 	}
 
+	
+	/*
+	 *Méthode du modèle
+	 */
+	public function creerEvenement($nom_evenement, $organisateur_id, $date_debut){
+		$data = array(
+			'nom_evenement' => $nom_evenement,
+			'date_debut' => $date_debut,
+			'date_fin' => $date_debut,
+			'date_soumission_debut' => $date_debut,
+			'date_soumission_fin' => $date_debut,
+			'date_acceptation' => $date_debut,
+			'date_acceptation_definitive' => $date_debut,
+			'date_remise' => $date_debut,
+			);
+		$this->create();
+		if(!$this->save($data))
+			return false;
+		
+		$evenement_id = $this->getInsertID();
+		
+		$data = array(
+				'participant_id' => $organisateur_id,
+				'evenement_id' => $evenement_id,
+				'est_organisateur' => 1,
+				);
+		//création de l'organisateur	
+		$this->Organisateur->create();
+		if(!$this->Organisateur->save($data)){
+			$this->delete($evenement_id);
+			return false;
+		}
+			
+		//création de la catégorie Normal
+		$data = array(
+				'evenement_id' => $evenement_id,
+				'nom_categorie' => 'Normal',
+				);
+		$this->Categorie->create();
+		if(!$this->Categorie->save($data)){
+			$this->delete($evenement_id);
+			return false;
+		}
+		
+		//création de l'option Entrée
+		App::uses('Option', 'Model');
+		$this->Option = new Option();
+		
+		$data = array(
+				'categorie_id' => $this->Categorie->getInsertID(),
+				'nom_option' => 'Entrée',
+				);
+		$this->Option->create();
+		if(!$this->Option->save($data)){
+			$this->delete($evenement_id);
+			return false;
+		}
+		
+		return true;
+	}
 }
 
 ?>
