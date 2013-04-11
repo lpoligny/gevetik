@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-04-11 17:17:04
+-- Date/time:                    2013-04-11 17:44:36
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -86,11 +86,12 @@ CREATE TABLE IF NOT EXISTS `option` (
   `option_id` int(10) NOT NULL AUTO_INCREMENT,
   `categorie_id` int(10) NOT NULL,
   `nom_option` varchar(50) NOT NULL,
+  `slug_option` varchar(50) NOT NULL,
   `prix_unitaire` float(10,2) NOT NULL DEFAULT '0.00',
   `quantite_minimum` int(10) NOT NULL DEFAULT '0',
   `quantite_maximum` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`option_id`),
-  UNIQUE KEY `unique` (`categorie_id`,`nom_option`),
+  UNIQUE KEY `unique` (`slug_option`,`categorie_id`),
   KEY `FK_categorie` (`categorie_id`),
   CONSTRAINT `FK_categorie` FOREIGN KEY (`categorie_id`) REFERENCES `categorie` (`categorie_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -42,6 +42,10 @@ class Option extends AppModel{
 											'rule' => array('notEmpty'),
 											'message' => "Vous devez spécifier un nom pour cette option.",
 											),
+								'unique' => array(
+											'rule' => array('slugify'),
+											'message' => "Cette option existe déjà.",
+											),
 								),
 				'quantite_minimum' => array(
 								'value' => array(
@@ -69,6 +73,30 @@ class Option extends AppModel{
 								),
 				);
 	
+	/**
+	 * Vérifie si une option est unique, pour un évènement, en générant un identifiant à partir de son nom.
+	 */
+	public function slugify($check){
+		//replacement basique
+		$replace = array('ê', 'é', 'è', 'à', 'ç');
+		$by = array('e', 'e', 'e', 'a', 'c');
+		$slug = str_replace($replace, $by, $check['nom_option']);
+		
+		//remplacement par regex
+		$pattern =  array('/@/', '#[/\s&\\\\]#', '/[^-_\d\w]/');
+		$replace = array('_at_', '_', '');
+		$slug = strtolower(preg_replace($pattern, $replace, $slug));
+		
+		if($this->find('count', array('conditions' => array(
+														'Option.categorie_id' => $this->data['Option']['categorie_id'],
+														'slug_option' => $slug,
+														))
+						)>0)
+			return false;
+		
+		$this->data['Option']['slug_option'] = $slug;
+		return true;
+	}
 	
 	public function beforeSave(){
 		//ajout des valeurs par défaut
