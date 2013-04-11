@@ -3,7 +3,7 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-03-29 22:22:33
+-- Date/time:                    2013-04-11 17:17:04
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -37,8 +37,9 @@ CREATE TABLE IF NOT EXISTS `categorie` (
   `categorie_id` int(10) NOT NULL AUTO_INCREMENT,
   `evenement_id` int(10) NOT NULL,
   `nom_categorie` varchar(50) NOT NULL,
+  `slug_categorie` varchar(50) NOT NULL,
   PRIMARY KEY (`categorie_id`),
-  UNIQUE KEY `unique` (`nom_categorie`,`evenement_id`),
+  UNIQUE KEY `unique` (`slug_categorie`,`evenement_id`),
   KEY `FK_evemement` (`evenement_id`),
   CONSTRAINT `FK_evemement` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -50,7 +51,9 @@ CREATE TABLE IF NOT EXISTS `categorie` (
 CREATE TABLE IF NOT EXISTS `evenement` (
   `evenement_id` int(10) NOT NULL AUTO_INCREMENT,
   `nom_evenement` varchar(50) NOT NULL,
+  `slug_evenement` varchar(50) NOT NULL,
   `description` text NOT NULL,
+  `adresse` text NOT NULL,
   `remise` int(10) NOT NULL DEFAULT '0',
   `date_remise` date NOT NULL,
   `date_soumission_debut` date NOT NULL,
@@ -59,7 +62,8 @@ CREATE TABLE IF NOT EXISTS `evenement` (
   `date_acceptation_definitive` date NOT NULL,
   `date_debut` date NOT NULL,
   `date_fin` date NOT NULL,
-  PRIMARY KEY (`evenement_id`)
+  PRIMARY KEY (`evenement_id`),
+  UNIQUE KEY `unique` (`slug_evenement`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -103,8 +107,8 @@ CREATE TABLE IF NOT EXISTS `option_paiement` (
   PRIMARY KEY (`option_paiement_id`),
   KEY `FK_paiement_option_paiement` (`paiement_id`),
   KEY `FK_option_option_paiement` (`option_id`),
-  CONSTRAINT `FK_option_option_paiement` FOREIGN KEY (`option_id`) REFERENCES `option` (`option_id`),
-  CONSTRAINT `FK_paiement_option_paiement` FOREIGN KEY (`paiement_id`) REFERENCES `paiement` (`paiement_id`)
+  CONSTRAINT `FK_paiement_option_paiement` FOREIGN KEY (`paiement_id`) REFERENCES `paiement` (`paiement_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_option_option_paiement` FOREIGN KEY (`option_id`) REFERENCES `option` (`option_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -115,12 +119,13 @@ CREATE TABLE IF NOT EXISTS `organisateur` (
   `organisateur_id` int(10) NOT NULL AUTO_INCREMENT,
   `evenement_id` int(10) NOT NULL,
   `participant_id` int(10) NOT NULL,
-  `nom_role` varchar(50) NOT NULL,
+  `nom_role` varchar(50) NOT NULL DEFAULT '',
+  `est_organisateur` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`organisateur_id`),
   UNIQUE KEY `UNIQUE` (`evenement_id`,`participant_id`),
   KEY `FK_participant_organisateur` (`participant_id`),
-  CONSTRAINT `FK_evenement_organisateur` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`),
-  CONSTRAINT `FK_participant_organisateur` FOREIGN KEY (`participant_id`) REFERENCES `participant` (`participant_id`)
+  CONSTRAINT `FK_evenement_organisateur` FOREIGN KEY (`evenement_id`) REFERENCES `evenement` (`evenement_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_participant_organisateur` FOREIGN KEY (`participant_id`) REFERENCES `participant` (`participant_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.
@@ -166,7 +171,6 @@ CREATE TABLE IF NOT EXISTS `participant` (
   `nom_participant` varchar(50) NOT NULL,
   `email_participant` varchar(100) NOT NULL,
   `mot_de_passe` varchar(50) NOT NULL,
-  `profession` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`participant_id`),
   UNIQUE KEY `unique` (`email_participant`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

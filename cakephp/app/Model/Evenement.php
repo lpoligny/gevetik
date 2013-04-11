@@ -44,6 +44,12 @@ class Evenement extends AppModel{
 											'rule' => array('notEmpty'),
 											'message' => "Vous devez spécifier un nom pour cet évènement.",
 											),
+								),								
+				'slug_evenement' => array(
+								'unique' => array(
+											'rule' => array('validSlug'),
+											'message' => "Cette identifiant d'évènement est déjà utilisé.",
+											),
 								),
 				'remise' => array(
 								'value' => array(
@@ -163,6 +169,22 @@ class Evenement extends AppModel{
 	/*
 	 *Méthodes de validation
 	 */
+	 
+
+	/**
+	 * Vérifie si un idenficateur d'évènement est unique en générant un identifiant à partir du nom de l'évènement.
+	 */
+	public function validSlug($check){
+		if(empty($check['slug_evenement'])){
+			$this->data['Evenement']['slug_evenement'] = $this->slugify($this->data['Evenement']['nom_evenement']);
+			$check['slug_evenement'] = $this->data['Evenement']['slug_evenement'];
+		}
+		
+		if($this->find('count', array('conditions' => array('slug_evenement' => $check['slug_evenement'])))>0)
+			return false;
+		return true;
+	}
+	
 	public function validPlanning($check_date, $date_start = ''){
 		$date_debut_evenement = new DateTime($this->data['Evenement']['date_debut']);
 		if(is_array($check_date))
@@ -203,6 +225,21 @@ class Evenement extends AppModel{
 		
 		return ($date_soumission_debut <= $check_date);
 	}
+	
+	public function beforeSave(){
+		if(!array_key_exists('slug_evenement', $this->data['Evenement']) || empty($this->data['Evenement']['slug_evenement']))
+			$this->data['Evenement']['slug_evenement'] = $this->slugify($this->data['Evenement']['nom_evenement']);
+		
+		$i = 1;
+		$slug = $this->data['Evenement']['slug_evenement'];
+		while(!$this->validSlug(array('slug_evenement' => $slug))){
+			$slug = $this->data['Evenement']['slug_evenement'].$i;
+			$i++;
+		}
+		
+		$this->data['Evenement']['slug_evenement'] = $slug;
+		return true;
+	}
 
 	
 	/*
@@ -220,6 +257,7 @@ class Evenement extends AppModel{
 			'date_remise' => $date_debut,
 			);
 		$this->create();
+		
 		if(!$this->save($data))
 			return false;
 		
@@ -238,31 +276,28 @@ class Evenement extends AppModel{
 		}
 			
 		//création de la catégorie Normal
-		$data = array(
-				'evenement_id' => $evenement_id,
-				'nom_categorie' => 'Normal',
-				);
-		$this->Categorie->create();
-		if(!$this->Categorie->save($data)){
+		debug($evenement_id);
+		if(!$this->Categorie->creerCategorie($evenement_id, 'Normal')){
 			$this->delete($evenement_id);
+			debug($this->Categorie->invalidFields());
 			return false;
 		}
-		
-		//création de l'option Entrée
-		App::uses('Option', 'Model');
-		$this->Option = new Option();
-		
-		$data = array(
-				'categorie_id' => $this->Categorie->getInsertID(),
-				'nom_option' => 'Entrée',
-				);
-		$this->Option->create();
-		if(!$this->Option->save($data)){
-			$this->delete($evenement_id);
-			return false;
-		}
-		
+	
 		return true;
+	}
+	
+	public function slugify($str){
+		//replacement basique
+		$replace = array('ê', 'é', 'è', 'à', 'ç');
+		$by = array('e', 'e', 'e', 'a', 'c');
+		$slug = str_replace($replace, $by, $str);
+		
+		//remplacement par regex
+		$pattern =  array('/@/', '#[/\s&\\\\]#', '/[^-_\d\w]/');
+		$replace = array('_at_', '_', '');
+		$slug = strtolower(preg_replace($pattern, $replace, $slug));
+		
+		return $slug;
 	}
 }
 
