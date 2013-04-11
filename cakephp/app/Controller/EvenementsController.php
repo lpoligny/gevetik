@@ -179,7 +179,7 @@ class EvenementsController extends AppController {
 						endforeach;
 						
 						$options = $this->Option->find('all', array('conditions' => array('Option.categorie_id' => $categories)));
-						debug($this->request->data);
+						// debug($this->request->data);
 						foreach($options as $option):
 							$option_id = $option['Option']['option_id'];
 							if(array_key_exists('delete_option_'.$option_id, $this->request->data['Option']))//suppression

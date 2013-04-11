@@ -86,8 +86,7 @@ echo $this->Form->end("Enregistrer");
 
 $type_organisateur = array(
 					'organisateur' 	=> 'Organisateur',
-					'guest'			=> 'Invité',
-					'assistant'		=> 'Assistant',
+					'comite'		=> 'Comité',
 					);
 if(!empty($participants)):				
 	echo $this->Form->create('Organisateur', array('type' => 'post'));
