@@ -1,7 +1,5 @@
 <?php
-/** BENJAMIN RABILLER
-/**
- * Matthias POSVITE
+/** 
  * Static content controller.
  *
  * This file will render views from views/pages/
@@ -73,8 +71,6 @@ class EvenementsController extends AppController {
 	}
 	
 	
-<<<<<<< HEAD
-=======
 	public function index() {
 		$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
 		$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
@@ -103,7 +99,6 @@ class EvenementsController extends AppController {
 		$this->Auth->logout();
 	}
 	
->>>>>>> origin/participant
 	public function organisateur(){
 		$this->loadModel('Option');
 		$this->loadModel('Participant');
