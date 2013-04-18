@@ -37,6 +37,6 @@ class AppController extends Controller {
 
 	function beforeFilter(){
 		parent::beforeFilter();
-		$this -> Auth -> allow('login');
+		$this -> Auth -> allow();
 	}
 }

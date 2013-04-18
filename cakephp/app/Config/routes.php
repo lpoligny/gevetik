@@ -50,7 +50,12 @@
 						'controller' => 'evenements', 
 						'action' => 'index',
 						));
-	
+	Router::connect('/:nom_evenement', 
+					array(
+						'controller' => 'evenements', 
+						'action' => 'index',
+						));
+
 	Router::connect('/:nom_evenement/:action/*', 
 					array(
 						'controller' => 'evenements', 
