@@ -180,13 +180,14 @@ class Evenement extends AppModel{
 			$check['slug_evenement'] = $this->data['Evenement']['slug_evenement'];
 		}
 		
-		$evenement_id = (array_key_exists('evenement_id', $this->data['Evenement']))?$this->data['Evenement'] :0;
+		$evenement_id = (array_key_exists('evenement_id', $this->data['Evenement']))?$this->data['Evenement']['evenement_id'] :0;
 		if($this->find('count', array('conditions' => array('evenement_id !='=> $evenement_id,
 															'slug_evenement' => $check['slug_evenement'])))
 															>0)
 			return false;
 		return true;
 	}
+	
 	
 	public function validPlanning($check_date, $date_start = ''){
 		$date_debut_evenement = new DateTime($this->data['Evenement']['date_debut']);
@@ -229,7 +230,7 @@ class Evenement extends AppModel{
 		return ($date_soumission_debut <= $check_date);
 	}
 	
-	public function beforeSave(){
+	public function beforeSave($options = array()){
 		if(!array_key_exists('slug_evenement', $this->data['Evenement']) || empty($this->data['Evenement']['slug_evenement']))
 			$this->data['Evenement']['slug_evenement'] = $this->slugify($this->data['Evenement']['nom_evenement']);
 		
@@ -289,21 +290,25 @@ class Evenement extends AppModel{
 	}
 	
 	public function getEvenement($evenement_idenfier){
+	
 		if(is_numeric($evenement_idenfier))
 			$res = $this->find('first', array(
 												'conditions' => array('Evenement.evenement_id' => $evenement_idenfier),
 												));
 		else
 			$res = $this->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $evenement_idenfier),
-													));
+													'conditions' => array(
+																	'OR' => array(
+																		'Evenement.nom_evenement' => $evenement_idenfier,
+																		'Evenement.slug_evenement' => $evenement_idenfier),
+													)));
+		
 		//si l'évènement n'existe pas										
 		if(!$res)
 			return null;
 		
 		$res['Evenement']['parsed_description'] = $this->parseDescription($res['Evenement']);
 		$res['Evenement']['parsable_fields'] = $this->getParsableFields();
-		
 		return $res;
 	}
 	

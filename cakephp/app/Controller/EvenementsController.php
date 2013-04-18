@@ -47,9 +47,8 @@ class EvenementsController extends AppController {
 		if(array_key_exists('nom_evenement', $params)){
 			$this->nomEvenement = $this->params['nom_evenement'];
 			
-			$res = $this->Evenement->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
-													));
+			$res = $this->Evenement->getEvenement($this->nomEvenement);
+			
 			//si l'évènement n'existe pas										
 			if (!$res) {
 				throw new NotFoundException(__('Evenement inconnu'));
@@ -59,6 +58,82 @@ class EvenementsController extends AppController {
 		}
 	}
 	
+	
+	
+	public function ajouter_article(){
+		$this->loadModel('Article');
+		$this->loadModel('Page_payee');
+		
+		if($this->request->is('post')){
+			$success = true;
+			
+			//ajout d'un article
+			$this->Article->create();
+			
+			if($this->Article->save($this->request->data))
+				$this->Session->setFlash('Article ajouté');
+			else{
+				$this->Session->setFlash('Echec de l\'ajout');
+				$success = false;
+			}
+			if($success)
+				$this->request->data = array();
+		}
+		
+		// $articles = $this->Article->find('all', array('conditions' => array('Article.evenement_id' => $this->evenementID)));
+		$this->set('evenement_id', $this->evenementID);
+		// $this->set('articles', $articles);
+	}
+	
+	public function article($article_id){
+		$this->loadModel('Article');
+		$this->loadModel('Page_payee');
+		$this->loadModel('Participant');
+		
+		$article = $this->Article->find('first', array('conditions' => array('article_id' => $article_id)));
+		
+		if($this->request->is('post')){
+			$success = true;
+			
+			if(array_key_exists('Article', $this->request->data)){
+				switch($this->request->data['Article']['action']){
+					case 'update':
+						$this->Article->id = $this->data['Article']['article_id'];
+						
+						if($this->Article->save($this->request->data))
+							$this->Session->setFlash('Article modifié');
+						else{
+							$this->Session->setFlash('Echec de modification');
+							$success = false;
+						}
+					break;
+				}
+			}
+			else if(array_key_exists('Page_payee', $this->request->data)){
+				switch($this->request->data['Page_payee']['action']){
+					
+					case 'bind':
+						$this->Page_payee->create();
+						if($this->Page_payee->save($this->request->data))
+							$this->Session->setFlash('Auteur associé');
+						else{
+							$this->Session->setFlash('Echec de l\'association');
+							$success = false;
+						}
+						break;
+				}
+			}
+			$article = $this->Article->find('first', array('conditions' => array('article_id' => $article_id)));
+		}
+		
+		
+		
+		// $this->set('evenement_id', $this->evenementID);
+		$this->set('article', $article);
+
+		$participants = $this->Participant->find('all');
+		$this->set('participants', $participants);
+	}
 	
 	public function organisateur(){
 		$this->loadModel('Option');
@@ -212,7 +287,7 @@ class EvenementsController extends AppController {
 								}
 							}
 						}
-						// endforeach;
+						
 						if($success)
 							$this->Session->setFlash('Option(s) modifiée(s)');
 						break;
@@ -221,9 +296,7 @@ class EvenementsController extends AppController {
 			
 			//mise à niveau
 			$this->request->data = array();
-			$res = $this->Evenement->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
-													));
+			$res = $this->Evenement->getEvenement($this->nomEvenement);
         }
 		//récupération des options
 		$categorie_ids = array();
