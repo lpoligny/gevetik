@@ -84,9 +84,8 @@ class EvenementsController extends AppController {
 		$result = $this->Participant->find('all');
 		if ($this->request->is('post')) {
 			if ($this->Auth->login()) {
-				//$this->redirect($this->Auth->redirect());
-				$this->Session->setFlash(__('Connexion OK'));
-				$this->redirect(array('controller' => $this->nomEvenement, 'action' => 'index'));
+				$this->Session->setFlash(__('Connexion réalisée avec succès'));
+				$this->redirect(array('controller' => $this->nomEvenement, 'action' => 'participant'));
 			}
 			 else {
 				$this->Session->setFlash(__('Login ou mot de passe incorrect'));
@@ -277,4 +276,11 @@ class EvenementsController extends AppController {
         }
 
     }
+
+	public function participant(){
+		$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
+		$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
+		$this->set('date_fin_evenement', $this->donneeEvenement['Evenement']['date_fin']);
+		$this->loadModel('Participant');
+	}
 }
