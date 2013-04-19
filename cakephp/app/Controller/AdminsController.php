@@ -89,6 +89,8 @@
 			if($this -> request -> is('post')){
 				$sent = $this -> request -> data['visible'];
 
+				$sent['evenement_active'] = $sent['visible'];
+
 				$this -> loadModel('Evenement');
 				$this -> Evenement -> save($sent);
 
