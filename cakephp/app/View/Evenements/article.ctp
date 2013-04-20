@@ -1,58 +1,36 @@
 
-<h4>Modifier l'article</h4>
+<h4>Article '<?php echo $article['Article']['titre'];?>'</h4>
 
+<strong>Page(s) :</strong> <?php echo $article['Article']['nombre_page']
+	.(($article['Article']['extra_page']>0)?'( dont '.$article['Article']['extra_page'].' page(s) supplémentaire(s) )' :'');?>
+<br/>
+<strong>Mots-clés :</strong> <?php echo $article['Article']['keywords'];?>
+<br/>
+<br/>
+<strong>Résumé :</strong>
+<br/>
+<p>
 <?php 
-echo $this->Form->create('Article', array('type' => 'post')); 
-	echo $this->Form->input('action', array(
-									'type' => 'hidden',
-									'value' => 'update',
-									));
-	echo $this->Form->input('article_id', array(
-									'type' => 'hidden',
-									'value' => $article['Article']['article_id'],
-									));
-	echo $this->Form->input('titre', array(
-									'type' => 'text',
-									'label' => "Titre de l'article",
-									'default' => $article['Article']['titre'],
-									));
-	echo $this->Form->input('resume', array(
-									'type' => 'textarea',
-									'label' => "Résumé de l'article",
-									'default' => $article['Article']['resume'],
-									));
-	echo $this->Form->input('nombre_page', array(
-									'type' => 'text',
-									'label' => "Nombre de pages",
-									'default' => $article['Article']['nombre_page'],
-									));
-	echo $this->Form->input('keywords', array(
-									'type' => 'text',
-									'label' => "Mots-clés",
-									'default' => $article['Article']['keywords'],
-									));
-echo $this->Form->end('Modifier');
+if(empty($article['Article']['resume']))
+	echo "Aucun résumé n'est disponible.";
+else
+	echo $article['Article']['resume'];
 ?>
-
-<h4>Associer l'article à des auteurs</h4>
+</p>
 
 <?php 
-echo $this->Form->create('Page_payee', array('type' => 'post'));
-	echo $this->Form->input('action', array(
-									'type' => 'hidden',
-									'value' => 'bind',
-									));
-	echo $this->Form->input('article_id', array(
-									'type' => 'hidden',
-									'value' => $article['Article']['article_id'],
-									));
-	$options = array();
-	foreach($participants as $participant)
-		$options[$participant['Participant']['participant_id']] = $participant['Participant']['nom_complet'];
-	
-	echo $this->Form->input('auteur_id', array(
-								'options' => $options,
-								'label' => "Auteur",
-								));
-echo $this->Form->end('Associer l\'article');
+if(!empty($auteurs)){
+	?>
+	<strong>Auteur(s) :</strong>
+	<ul>
+		<?php 
+		foreach($auteurs as $auteur):
+			?>
+			<li><?php echo $auteur['Participant']['nom_complet'];?></li>
+			<?php 
+		endforeach;
+		?>
+	</ul>
+	<?php 
+}
 ?>

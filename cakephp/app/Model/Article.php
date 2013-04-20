@@ -60,7 +60,6 @@ class Article extends AppModel{
 											),
 								),
 				);
-	
 }
 
 ?>
