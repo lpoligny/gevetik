@@ -282,7 +282,6 @@ class Evenement extends AppModel{
 		//création de la catégorie Normal
 		if(!$this->Categorie->creerCategorie($evenement_id, 'Normal')){
 			$this->delete($evenement_id);
-			debug($this->Categorie->invalidFields());
 			return false;
 		}
 	

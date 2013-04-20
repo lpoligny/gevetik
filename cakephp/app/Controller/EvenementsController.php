@@ -85,12 +85,29 @@ class EvenementsController extends AppController {
 		// $this->set('articles', $articles);
 	}
 	
-	public function article($article_id){
+	public function article($article_id, $sous_action = ''){
 		$this->loadModel('Article');
 		$this->loadModel('Page_payee');
 		$this->loadModel('Participant');
 		
 		$article = $this->Article->find('first', array('conditions' => array('article_id' => $article_id)));
+		if(!$article){
+			throw new NotFoundException(__('Article introuvable'));
+		}
+		
+		switch($sous_action){
+			case 'edit':
+				$this->_article_edit($article);
+				break;
+		}
+		
+		$auteurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		$this->set('article', $article);
+		$this->set('auteurs', $auteurs);
+	}
+	
+	public function _article_edit($article){
+		$article_id = $article['Article']['article_id'];
 		
 		if($this->request->is('post')){
 			$success = true;
@@ -110,29 +127,47 @@ class EvenementsController extends AppController {
 				}
 			}
 			else if(array_key_exists('Page_payee', $this->request->data)){
-				switch($this->request->data['Page_payee']['action']){
+				
+				if($this->request->data['Page_payee']['auteur_id']!=0):
+					$data = array(
+							'article_id' => $this->request->data['Page_payee']['article_id'],
+							'auteur_id' => $this->request->data['Page_payee']['auteur_id'],
+							);
+					$this->Page_payee->create();
+					if(!$this->Page_payee->save($data))
+						$success = false;
+				endif;
+				
+				foreach($this->request->data['Page_payee'] as $key => $value){
+					if($key=='unbind_'.$value){
+						$this->Page_payee->delete($value);
+					}
 					
-					case 'bind':
-						$this->Page_payee->create();
-						if($this->Page_payee->save($this->request->data))
-							$this->Session->setFlash('Auteur associé');
-						else{
-							$this->Session->setFlash('Echec de l\'association');
-							$success = false;
-						}
-						break;
 				}
+				if($success)
+					$this->Session->setFlash('Mise à jour des contributeurs terminé');
+				else
+					$this->Session->setFlash('Echec de la mise à jour des contributeurs');
+				
 			}
 			$article = $this->Article->find('first', array('conditions' => array('article_id' => $article_id)));
 		}
 		
 		
+		$auteurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		$exclude = array();
 		
-		// $this->set('evenement_id', $this->evenementID);
+		foreach($auteurs as $auteur)
+			$exclude[] = $auteur['Page_payee']['auteur_id'];
+		
+		$participants = $this->Participant->find('all', array('conditions' => array('NOT' => array('Participant.participant_id' => $exclude))));
+		
+		
 		$this->set('article', $article);
+		$this->set('auteurs', $auteurs);
 
-		$participants = $this->Participant->find('all');
 		$this->set('participants', $participants);
+		$this->render('article_edit');
 	}
 	
 	public function organisateur(){
