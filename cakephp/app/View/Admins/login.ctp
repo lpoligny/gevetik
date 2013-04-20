@@ -1,8 +1,5 @@
 <?php
-
-	// Jonathan
-
-	echo $this -> Form -> create('GestionnaireFinances');
+	echo $this -> Form -> create('Admins');
 
 	echo $this -> Form -> input('login', array('label' => "Login :"));
 

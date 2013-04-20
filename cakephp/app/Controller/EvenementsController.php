@@ -1,6 +1,5 @@
 <?php
-/**
- * Matthias POSVITE
+/** 
  * Static content controller.
  *
  * This file will render views from views/pages/
@@ -30,7 +29,7 @@ class EvenementsController extends AppController {
  * @var string
  */
 	public $name = 'Evenements';
-
+	public $evenementID = 0;
 	public $helpers = array('Html', 'Form');
 	
 	public $uses = array();
@@ -38,6 +37,17 @@ class EvenementsController extends AppController {
 	public $evenementID = 0;
 	public $nomEvenement = '';
 	public $donneeEvenement = '';
+
+	public $components = array('Session',
+		                          'Auth' => array(
+		                              'authenticate' => array(
+		                                          'Form' => array(
+		                                              'fields' => array('username' => 'email_participant', 'password' => 'mot_de_passe'),
+		                                              'userModel' => 'Participant',
+		                                              )
+		                                          ),
+		                              )
+		                   	);
 
 	
 	function beforeFilter(){
@@ -56,9 +66,38 @@ class EvenementsController extends AppController {
 			}	
 			$this->evenementID = $res['Evenement']['evenement_id'];
 			$this->donneeEvenement = $res;
+			$this->evenementID = $res['Evenement']['evenement_id'];
 		}
 	}
 	
+	
+	public function index() {
+		$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
+		$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
+		$this->set('date_fin_evenement', $this->donneeEvenement['Evenement']['date_fin']);
+		$this->login();
+
+	}
+
+	public function login() {
+		$this->logout();
+		$this->loadModel('Participant');
+		$result = $this->Participant->find('all');
+		if ($this->request->is('post')) {
+			if ($this->Auth->login()) {
+				//$this->redirect($this->Auth->redirect());
+				$this->Session->setFlash(__('Connexion OK'));
+				$this->redirect(array('controller' => $this->nomEvenement, 'action' => 'index'));
+			}
+			 else {
+				$this->Session->setFlash(__('Login ou mot de passe incorrect'));
+			}
+		}
+	}
+
+	public function logout() {
+		$this->Auth->logout();
+	}
 	
 	public function organisateur(){
 		$this->loadModel('Option');
@@ -271,16 +310,19 @@ class EvenementsController extends AppController {
 	/************************************************************************************************************************************************/
 	/************************************************************************************************************************************************/
 
-	public function add() {
+	public function inscription() {
+	$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
+	$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
+	$this->set('date_fin_evenement', $this->donneeEvenement['Evenement']['date_fin']);
 	$this->loadModel('Participant');
 	$result = $this->Participant->find('all');
         if ($this->request->is('post')) {
             $this->Participant->create();
             if ($this->Participant->save($this->request->data)) {
-                $this->Session->setFlash(__('The user has been saved'));
-                $this->redirect(array('action' => 'index'));
+                $this->Session->setFlash(__('Votre inscription a été prise en compte'));
+                $this->redirect(array('controller' => $this->nomEvenement, 'action' => 'index'));
             } else {
-                $this->Session->setFlash(__('The user could not be saved. Please, try again.'));
+                $this->Session->setFlash(__('Votre inscritpion à echoué.'));
             }
         }
 

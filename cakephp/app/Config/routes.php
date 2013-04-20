@@ -29,10 +29,10 @@
 	/**
 	 * Route d'accès en admin
 	 */
-	/*Router::connect('/admin/:action/*', 
+	Router::connect('/admins/:action/*', 
 					array(
-						//'controller' => 'evenements', 
-						));*/
+						'controller' => 'admins', 
+						));
 	
 	/**
 	 * Route d'accès pour le service financier
@@ -50,7 +50,12 @@
 						'controller' => 'evenements', 
 						'action' => 'index',
 						));
-	
+	Router::connect('/:nom_evenement', 
+					array(
+						'controller' => 'evenements', 
+						'action' => 'index',
+						));
+
 	Router::connect('/:nom_evenement/:action/*', 
 					array(
 						'controller' => 'evenements', 
