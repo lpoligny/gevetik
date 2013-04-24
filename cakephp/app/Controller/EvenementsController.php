@@ -29,7 +29,6 @@ class EvenementsController extends AppController {
  * @var string
  */
 	public $name = 'Evenements';
-	public $evenementID = 0;
 	public $helpers = array('Html', 'Form');
 	
 	public $uses = array();
@@ -55,19 +54,19 @@ class EvenementsController extends AppController {
 		
 		$params = $this->params->params;
 		if(array_key_exists('nom_evenement', $params)){
-			$this->nomEvenement = $this->params['nom_evenement'];
+			$this->nomEvenement = $params['nom_evenement'];
 			
-			$res = $this->Evenement->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
-													));
+			$res = $this->Evenement->getEvenement($this->nomEvenement);
+			
 			//si l'évènement n'existe pas										
 			if (!$res) {
 				throw new NotFoundException(__('Evenement inconnu'));
 			}	
 			$this->evenementID = $res['Evenement']['evenement_id'];
 			$this->donneeEvenement = $res;
-			$this->evenementID = $res['Evenement']['evenement_id'];
 		}
+		else
+			throw new NotFoundException(__('Situation impossible !'));
 	}
 	
 	

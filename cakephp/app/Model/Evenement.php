@@ -228,7 +228,6 @@ class Evenement extends AppModel{
 		
 		return ($date_soumission_debut <= $check_date);
 	}
-<<<<<<< HEAD
 	
 	public function beforeSave(){
 		if(!array_key_exists('slug_evenement', $this->data['Evenement']) || empty($this->data['Evenement']['slug_evenement']))
@@ -344,8 +343,7 @@ class Evenement extends AppModel{
 		
 		return str_replace($replace, $by, $evenement['description']);
 	}
-=======
->>>>>>> origin/participant
+
 }
 
 ?>
