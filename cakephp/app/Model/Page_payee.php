@@ -12,8 +12,16 @@ class Page_payee extends AppModel{
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $belongsTo = array('Article', 'Auteur');
-				
+	public $belongsTo = array(
+						'Article' => array(
+							'className' => 'Article',
+							),
+						'Participant' => array(
+							'className' => 'Participant',
+							'foreignKey' => 'auteur_id',
+							),
+						);
+			
 	/**
 	 * Définition du comportement du modèle
 	 * http://book.cakephp.org/2.0/en/models/behaviors.html
