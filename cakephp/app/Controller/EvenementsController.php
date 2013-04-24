@@ -99,11 +99,47 @@ class EvenementsController extends AppController {
 			case 'edit':
 				$this->_article_edit($article);
 				break;
+			case 'paiement':
+				$this->_article_paiement($article);
+				break;
 		}
 		
 		$auteurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
 		$this->set('article', $article);
 		$this->set('auteurs', $auteurs);
+	}
+	
+	public function _article_paiement($article){
+		$this->loadModel('Paiement');
+		
+		$article_id = $article['Article']['article_id'];
+		$payeurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		
+		if($this->request->is('post')){
+			if(array_key_exists('Page_payee', $this->request->data)){
+				
+				if($this->request->data['Page_payee']['extra_page']<=0)
+					$this->Session->setFlash('Vous devez préciser le nombre de page à payer');
+				else if($this->Page_payee->payer($this->request->data['Page_payee']['page_payee_id'],
+											$this->request->data['Page_payee']['extra_page'],
+											$this->request->data['Page_payee']['type_paiement']
+											))
+					$this->Session->setFlash('Paiement effectué');
+				else
+					$this->Session->setFlash('Echec du paiement');
+				
+			}
+			$this->request->data = array();
+			$payeurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		}
+		
+		
+		$this->set('types_paiement', $this->Paiement->getTypesPaiement());
+		$this->set('article', $article);
+		$this->set('payeurs', $payeurs);
+		
+		$this->render('article_paiement');
+		
 	}
 	
 	public function _article_edit($article){
@@ -169,6 +205,7 @@ class EvenementsController extends AppController {
 		$this->set('participants', $participants);
 		$this->render('article_edit');
 	}
+	
 	
 	public function organisateur(){
 		$this->loadModel('Option');
