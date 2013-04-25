@@ -22,7 +22,6 @@ echo $this->Form->create('Evenement', array('type' => 'post'));
 	
 	echo $this->Form->input('evenement_id', array(
 				'type' => 'hidden',
-				'label' => 'evenement_id',
 				'default' => $evenement['evenement_id'],
 				));
 							

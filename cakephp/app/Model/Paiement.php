@@ -49,6 +49,13 @@ class Paiement extends AppModel{
 											),
 								)
 				);
+				
+	public function getTypesPaiement(){
+		return array(
+				'cb' => 'CB',
+				'cheque' => 'Chèque',
+				);
+	}
 }
 
 ?>

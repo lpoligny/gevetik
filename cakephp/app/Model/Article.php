@@ -12,7 +12,7 @@ class Article extends AppModel{
 	 * Définition des liens entre les modèles
 	 * http://book.cakephp.org/2.0/en/models/associations-linking-models-together.html
 	 */
-	public $hasOne = array(
+	public $belongsTo = array(
 				'Evenement' => array(
 								'className' => 'Evenement',
 								),
@@ -36,16 +36,10 @@ class Article extends AppModel{
 	 * http://book.cakephp.org/2.0/en/models/data-validation.html
 	 */
 	public $validate = array(
-				'nom_titre' => array(
+				'titre' => array(
 								'required' => array(
 											'rule' => array('notEmpty'),
 											'message' => "Vous devez spécifier un titre pour cet article.",
-											),
-								),
-				'resume' => array(
-								'required' => array(
-											'rule' => array('notEmpty'),
-											'message' => "Vous devez spécifier un résumé pour cet article.",
 											),
 								),
 				'nombre_page' => array(

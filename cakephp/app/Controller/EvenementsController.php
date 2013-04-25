@@ -98,6 +98,154 @@ class EvenementsController extends AppController {
 		$this->Auth->logout();
 	}
 	
+	
+	public function ajouter_article(){
+		$this->loadModel('Article');
+		$this->loadModel('Page_payee');
+		
+		if($this->request->is('post')){
+			$success = true;
+			
+			//ajout d'un article
+			$this->Article->create();
+			
+			if($this->Article->save($this->request->data))
+				$this->Session->setFlash('Article ajouté');
+			else{
+				$this->Session->setFlash('Echec de l\'ajout');
+				$success = false;
+			}
+			if($success)
+				$this->request->data = array();
+		}
+		
+		// $articles = $this->Article->find('all', array('conditions' => array('Article.evenement_id' => $this->evenementID)));
+		$this->set('evenement_id', $this->evenementID);
+		// $this->set('articles', $articles);
+	}
+	
+	public function article($article_id, $sous_action = ''){
+		$this->loadModel('Article');
+		$this->loadModel('Page_payee');
+		$this->loadModel('Participant');
+		
+		$article = $this->Article->find('first', array('conditions' => array('article_id' => $article_id)));
+		if(!$article){
+			throw new NotFoundException(__('Article introuvable'));
+		}
+		
+		switch($sous_action){
+			case 'edit':
+				$this->_article_edit($article);
+				break;
+			case 'paiement':
+				$this->_article_paiement($article);
+				break;
+		}
+		
+		$auteurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		$this->set('article', $article);
+		$this->set('auteurs', $auteurs);
+	}
+	
+	public function _article_paiement($article){
+		$this->loadModel('Paiement');
+		
+		$article_id = $article['Article']['article_id'];
+		$payeurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		
+		if($this->request->is('post')){
+			if(array_key_exists('Page_payee', $this->request->data)){
+				
+				if($this->request->data['Page_payee']['extra_page']<=0)
+					$this->Session->setFlash('Vous devez préciser le nombre de page à payer');
+				else if($this->Page_payee->payer($this->request->data['Page_payee']['page_payee_id'],
+											$this->request->data['Page_payee']['extra_page'],
+											$this->request->data['Page_payee']['type_paiement']
+											))
+					$this->Session->setFlash('Paiement effectué');
+				else
+					$this->Session->setFlash('Echec du paiement');
+				
+			}
+			$this->request->data = array();
+			$payeurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		}
+		
+		
+		$this->set('types_paiement', $this->Paiement->getTypesPaiement());
+		$this->set('article', $article);
+		$this->set('payeurs', $payeurs);
+		
+		$this->render('article_paiement');
+		
+	}
+	
+	public function _article_edit($article){
+		$article_id = $article['Article']['article_id'];
+		
+		if($this->request->is('post')){
+			$success = true;
+			
+			if(array_key_exists('Article', $this->request->data)){
+				switch($this->request->data['Article']['action']){
+					case 'update':
+						$this->Article->id = $this->data['Article']['article_id'];
+						
+						if($this->Article->save($this->request->data))
+							$this->Session->setFlash('Article modifié');
+						else{
+							$this->Session->setFlash('Echec de modification');
+							$success = false;
+						}
+					break;
+				}
+			}
+			else if(array_key_exists('Page_payee', $this->request->data)){
+				
+				if($this->request->data['Page_payee']['auteur_id']!=0):
+					$data = array(
+							'article_id' => $this->request->data['Page_payee']['article_id'],
+							'auteur_id' => $this->request->data['Page_payee']['auteur_id'],
+							);
+					$this->Page_payee->create();
+					if(!$this->Page_payee->save($data))
+						$success = false;
+				endif;
+				
+				foreach($this->request->data['Page_payee'] as $key => $value){
+					if($key=='unbind_'.$value){
+						$this->Page_payee->delete($value);
+					}
+					
+				}
+				if($success)
+					$this->Session->setFlash('Mise à jour des contributeurs terminé');
+				else
+					$this->Session->setFlash('Echec de la mise à jour des contributeurs');
+				
+			}
+			$article = $this->Article->find('first', array('conditions' => array('article_id' => $article_id)));
+		}
+		
+		
+		$auteurs = $this->Page_payee->find('all', array('conditions' => array('Page_payee.article_id' => $article_id)));
+		$exclude = array();
+		
+		foreach($auteurs as $auteur)
+			$exclude[] = $auteur['Page_payee']['auteur_id'];
+		
+		$participants = $this->Participant->find('all', array('conditions' => array('NOT' => array('Participant.participant_id' => $exclude))));
+		
+		
+		$this->set('article', $article);
+		$this->set('auteurs', $auteurs);
+
+		$this->set('participants', $participants);
+		$this->render('article_edit');
+	}
+	
+	
 	public function organisateur(){
 		$this->loadModel('Option');
 		$this->loadModel('Participant');
@@ -250,7 +398,7 @@ class EvenementsController extends AppController {
 								}
 							}
 						}
-						// endforeach;
+						
 						if($success)
 							$this->Session->setFlash('Option(s) modifiée(s)');
 						break;
@@ -259,9 +407,7 @@ class EvenementsController extends AppController {
 			
 			//mise à niveau
 			$this->request->data = array();
-			$res = $this->Evenement->find('first', array(
-													'conditions' => array('Evenement.nom_evenement' => $this->nomEvenement),
-													));
+			$res = $this->Evenement->getEvenement($this->nomEvenement);
         }
 		//récupération des options
 		$categorie_ids = array();
@@ -302,12 +448,6 @@ class EvenementsController extends AppController {
 	
 
 	/************************************************************************************************************************************************/
-	/************************************************************************************************************************************************/
-	/************************************************************************************************************************************************/
-	/************************************************************************************************************************************************/
-	/************************************************************************************************************************************************/
-	/************************************************************************************************************************************************/
-	/************************************************************************************************************************************************/
 
 	public function inscription() {
 	$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
@@ -327,3 +467,4 @@ class EvenementsController extends AppController {
 
     }
 }
+?>
