@@ -4,6 +4,17 @@
 
 	debug($infos);
 	//debug($evt_id);
+	debug($deja);
+
+
+	$diff = array();
+	foreach($infos as $cle => $valeur){
+		foreach($deja as $cled => $valeurd){
+			if($valeur['Organisateur']['participant_id'] == $valeurd['Organisateur']['participant_id']){
+				$diff[] = $valeur['Organisateur']['participant_id'];
+			}
+		}
+	}
 
 	$res = "";
 
@@ -14,13 +25,13 @@
 	*/
 	$res .= "<div class=\"bloc_infos\"> ";
 
-	$res .= $infos['Evenement']['nom_evenement']." - Du ".$infos['Evenement']['date_debut']." au ".$infos['Evenement']['date_fin']."<br/>";
+	$res .= $evenement['Evenement']['nom_evenement']." - Du ".$evenement['Evenement']['date_debut']." au ".$evenement['Evenement']['date_fin']."<br/>";
 
 	$res .= $this -> Form -> create('visible',array('url' => 'modifier_visibilite'));
 
-	$res .= $this -> Form -> input('evenement_id',array("type" => 'hidden','value' => $evt_id['id_evt']));
+	$res .= $this -> Form -> input('evenement_id',array("type" => 'hidden','value' => $evenement['Evenement']['evenement_id']));
 
-	$checked = $infos['Evenement']['visible'];
+	$checked = $evenement['Evenement']['visible'];
 
 	$res .= $this -> Form -> input('visible',array('type' => 'checkbox','label' => "Visible",'checked' => $checked));
 
@@ -41,17 +52,25 @@
 
 	$res .= $this -> Form -> create('gerer_orga',array('url' => 'gerer_organisateurs'));
 
-	$res .= $this -> Form -> input('evenement_id',array("type" => 'hidden','value' => $evt_id['id_evt']));
+	$res .= $this -> Form -> input('evenement_id',array("type" => 'hidden','value' => $evenement['Evenement']['evenement_id']));
 
 	$res .= "<table>";
 
-	$res .= $this -> Html -> tableHeaders(array('Organisateur','Mail'));
+	$res .= $this -> Html -> tableHeaders(array('Organisateur','Mail','Ajouter'));
 
-	foreach ($infos as $i){
-		$data = $i['Participant'];
-		$checkbox = $this -> Form ->checkbox('gerer_orga_'.$i['Organisateur']['organisateur_id']);
-		$res .= $this -> Html -> tableCells(array($data['nom_complet'],$data['email_participant'],$checkbox));
+	$cells = array();
+
+	foreach ($infos as $cle => $valeur){
+		$participant = $valeur['Participant'];
+		$nom = $participant['prenom_participant'].' '.$participant['nom_participant'];
+
+		$checked = (in_array($participant['participant_id'],$diff)) ? true : false;
+		$checkbox = $this -> Form ->checkbox($valeur['Participant']['participant_id'],array('checked' => $checked));
+
+		$cells[] = array($nom,$participant['email_participant'],$checkbox);
 	}
+
+	$res .= $this -> Html -> tableCells($cells);
 
 	$res .= "</table>";
 
