@@ -3,7 +3,6 @@
 
 <h4>Editer un évènement</h4>
 <?php 
-////////////////echo strftime("%d %B %Y à %H:%M", time());
 echo $this->Form->create('Evenement', array('type' => 'post'));
 	echo $this->Form->input('nom_evenement', array(
 				'label' => "Nom de l'évènement",
@@ -25,7 +24,19 @@ echo $this->Form->create('Evenement', array('type' => 'post'));
 				'label' => 'evenement_id',
 				'default' => $evenement['evenement_id'],
 				));
-							
+	
+	echo $this->Form->input('nombre_page_accepte', array(
+				'type' => 'text',
+				'label' => "Nombre de page maximum",
+				'default' => $evenement['nombre_page_accepte'],
+				));
+	
+	echo $this->Form->input('prix_unitaire_extra_page', array(
+				'type' => 'text',
+				'label' => "Prix unitaire d'une page supplémentaire",
+				'default' => $evenement['prix_unitaire_extra_page'],
+				));
+	
 	echo $this->Form->input('description', array(
 				'type' => 'textarea',
 				'label' => 'Description',

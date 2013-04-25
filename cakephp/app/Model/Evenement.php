@@ -58,6 +58,18 @@ class Evenement extends AppModel{
 											'allowEmpty' => true,
 											),
 								),
+				'nombre_page_accepte' => array(
+								'value' => array(
+											'rule' => array('naturalNumber', true),
+											'message' => 'Le nombre de page maximum doit être positif ou nul.',
+											),
+								),
+				'prix_unitaire_extra_page' => array(
+								'value' => array(
+											'rule' => array('naturalNumber', true),
+											'message' => 'Le prix unitaire d\'une page supplémentaire doit être positif ou nul.',
+											),
+								),
 				'date_remise' => array(
 								'required' => array(
 											'rule' => array('notEmpty'),
@@ -281,7 +293,7 @@ class Evenement extends AppModel{
 		//création de la catégorie Normal
 		if(!$this->Categorie->creerCategorie($evenement_id, 'Normal')){
 			$this->delete($evenement_id);
-			debug($this->Categorie->invalidFields());
+			$this->Categorie->invalidFields();
 			return false;
 		}
 	
