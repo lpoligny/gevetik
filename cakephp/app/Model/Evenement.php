@@ -248,11 +248,11 @@ class Evenement extends AppModel{
 	/*
 	 *Méthode du modèle
 	 */
-	public function creerEvenement($nom_evenement, $organisateur_id, $date_debut){
+	public function creerEvenement($nom_evenement, $organisateur_id, $date_debut, $date_fin = ''){
 		$data = array(
 			'nom_evenement' => $nom_evenement,
 			'date_debut' => $date_debut,
-			'date_fin' => $date_debut,
+			'date_fin' => (empty($date_fin))?$date_debut :$date_fin,
 			'date_soumission_debut' => $date_debut,
 			'date_soumission_fin' => $date_debut,
 			'date_acceptation' => $date_debut,

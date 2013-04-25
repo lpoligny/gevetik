@@ -45,6 +45,7 @@ class EvenementsController extends AppController {
 		                                              'userModel' => 'Participant',
 		                                              )
 		                                          ),
+										'authorize' => 'Controller',
 		                              )
 		                   	);
 
@@ -67,7 +68,58 @@ class EvenementsController extends AppController {
 		}
 		else
 			throw new NotFoundException(__('Situation impossible !'));
+			
+		if(!$this->Auth->loggedIn())
+			$this->isAuthorized();
 	}
+	
+	
+	public function isAuthorized($user = null) {
+		if($user==null)
+			$user = array(
+					'groupe' => 'unknown',
+					'participant_id' => 0,
+					'id' => 0,
+					);
+		if($user['groupe']!='participant')
+			throw new ForbiddenException(__("Vous n'êtes pas autorisé à accéder à cette section."));
+
+		$action = $this->request->params['action'];
+		$params = $this->request->params['pass'];
+		
+		switch($action){
+			case 'organisateur':
+				$this->loadModel('Organisateur');
+				$res = $this->Organisateur->find('first', array('conditions' => array(
+																			'Organisateur.evenement_id' => $this->evenementID,
+																			'Organisateur.participant_id' => $user['participant_id'],
+																			)));
+				if(!$res)
+					throw new ForbiddenException(__("Vous n'êtes pas autorisé à accéder à cette section."));
+				else if(!$res['Organisateur']['est_organisateur'])
+					throw new ForbiddenException(__("Seul les organisateurs peuvent accéder à cette section."));
+				break;
+				
+			case 'article':
+				$article_id = $param[0];
+				$sub_action = '';
+				if(isset($param[1]))
+					$sub_action = $param[1];
+				
+				//accès à l'article
+				$this->loadModel('Page_payee');
+				$res = $this->Page_payee->find('first', array('conditions' => array(
+																		'Page_payee.article_id' => $article_id,
+																		'Page_payee.participant_id' => $user['participant_id'],
+																		)));
+				//un non-contributeur ne peut éditer ou payer un article.
+				if(!$res && in_array($sub_action, array('edit', 'paiement')))
+					throw new ForbiddenException(__("Vous devez etre un contributeur de l'article pour accéder à cette page."));					
+				break;
+		}
+		
+        return true;
+    }
 	
 	
 	public function index() {
@@ -80,10 +132,9 @@ class EvenementsController extends AppController {
 
 	public function login() {
 		$this->logout();
-		$this->loadModel('Participant');
-		$result = $this->Participant->find('all');
 		if ($this->request->is('post')) {
 			if ($this->Auth->login()) {
+				parent::initializeLogin();
 				//$this->redirect($this->Auth->redirect());
 				$this->Session->setFlash(__('Connexion OK'));
 				$this->redirect(array('controller' => $this->nomEvenement, 'action' => 'index'));
@@ -98,10 +149,12 @@ class EvenementsController extends AppController {
 		$this->Auth->logout();
 	}
 	
-	public function organisateur(){
+	public function organisateur(){	
 		$this->loadModel('Option');
 		$this->loadModel('Participant');
 		$this->loadModel('Organisateur');
+		
+		
 		
 		$res = $this->donneeEvenement;
 		
