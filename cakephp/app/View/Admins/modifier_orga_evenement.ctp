@@ -99,7 +99,7 @@
 
 	$res .= "</div>";*/
 
-
+	$res .= $this -> Html -> link('Revenir à l\'index','/admins/index');
 
 	echo $res;
 ?>

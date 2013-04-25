@@ -83,6 +83,7 @@
 			}
 		}
 
+		// MAJ des organisateurs affectés à un évènement
 		function gerer_organisateurs(){
 			if($this -> request -> is('post')){
 				$sent = $this -> request -> data['gerer_orga'];
@@ -159,7 +160,7 @@
 			if($this -> request -> is('post')){
 				$sent = $this -> request -> data['visible'];
 
-				// Pour coller avec le nom utilise par Matthias
+				// Pour coller avec le nom utilisé par Matthias
 				$sent['evenement_active'] = $sent['visible'];
 
 				$this -> loadModel('Evenement');

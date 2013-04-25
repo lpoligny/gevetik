@@ -42,5 +42,7 @@
 
 	$res .= $this -> Form -> button('Enregistrer le nouvel évènement',array('type' => 'submit'));
 
+	$res .= $this -> Html -> link('Revenir à l\'index','/admins/index');
+
 	echo $res;
 ?>
