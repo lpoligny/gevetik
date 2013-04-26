@@ -103,16 +103,16 @@ class EvenementsController extends AppController {
 				break;
 				
 			case 'article':
-				$article_id = $param[0];
+				$article_id = $params[0];
 				$sub_action = '';
-				if(isset($param[1]))
-					$sub_action = $param[1];
+				if(isset($params[1]))
+					$sub_action = $params[1];
 				
 				//accès à l'article
 				$this->loadModel('Page_payee');
 				$res = $this->Page_payee->find('first', array('conditions' => array(
 																		'Page_payee.article_id' => $article_id,
-																		'Page_payee.participant_id' => $user['participant_id'],
+																		'Page_payee.auteur_id' => $user['participant_id'],
 																		)));
 				//un non-contributeur ne peut éditer ou payer un article.
 				if(!$res && in_array($sub_action, array('edit', 'paiement')))
