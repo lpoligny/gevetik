@@ -98,7 +98,7 @@ class Option extends AppModel{
 		return true;
 	}
 	
-	public function beforeSave(){
+	public function beforeSave($options = array()){
 		//ajout des valeurs par défaut
 		if(empty($this->data['Option']['quantite_minimum']))
 			$this->data['Option']['quantite_minimum'] = 0;

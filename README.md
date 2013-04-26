@@ -15,3 +15,10 @@ C'est un site « clé en main » développé en [CakePHP](http://www.cakephp.org
 Pour les tests le dévellopement est fait avec une connexion MySQL avec les paramètres suivants :
  * utilisateur `gevetik`
  * Mot Passe `gevetik`
+
+
+Pour la page de la gestion financière :
+  http://localhost/gestionnaireFinances/login/
+
+Pour ajouter des événements :
+  http://localhost/

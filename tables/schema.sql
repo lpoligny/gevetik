@@ -3,7 +3,9 @@
 -- Server version:               5.1.53-community-log - MySQL Community Server (GPL)
 -- Server OS:                    Win64
 -- HeidiSQL version:             7.0.0.4053
+
 -- Date/time:                    2013-04-25 16:33:35
+
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -21,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `article` (
   `evenement_id` int(10) NOT NULL,
   `titre` varchar(250) NOT NULL,
   `resume` text NOT NULL,
-  `nombre_page` int(10) NOT NULL DEFAULT '0',
+  `nombre_page` int(10) NOT NULL,
   `extra_page` int(10) NOT NULL DEFAULT '0',
   `keywords` text NOT NULL,
   PRIMARY KEY (`article_id`),
