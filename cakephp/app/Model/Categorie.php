@@ -124,6 +124,31 @@ class Categorie extends AppModel{
 		return true;
 	}
 	
+	/**
+	 * Récupère les catégories d'un évènement en remplaçant les clés numériques 
+	 * par le slug de la catégorie et de l'option
+	 */
+	public function getCategories($evenement_id){
+		$res = $this->find('all', array('conditions' => array('Categorie.evenement_id' => $evenement_id)));
+		
+		$categories = array();
+		
+		foreach($res as $row){
+			$slug_categorie = $row['Categorie']['slug_categorie'];
+			$categories[$slug_categorie] = array(
+										'Categorie' => $row['Categorie'],
+										'Evenement' => $row['Evenement'],
+										'Option' => array(),
+										);
+			
+			foreach($row['Option'] as $option):
+				$categories[$slug_categorie]['Option'][$option['slug_option']] = $option;			
+			endforeach;
+		}
+		
+		return $categories;
+	}
+	
 }
 
 ?>

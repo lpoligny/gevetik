@@ -73,7 +73,9 @@ class EvenementsController extends AppController {
 			$this->isAuthorized();
 	}
 	
-	
+	/**
+	 * Gestion des permissions du controleur evenements
+	 */
 	public function isAuthorized($user = null) {
 		if($user==null)
 			$user = array(
@@ -123,11 +125,14 @@ class EvenementsController extends AppController {
 	
 	
 	public function index() {
+		$this->loadModel('Categorie');
+		$res = $this->Categorie->getCategories($this->evenementID);
+		
 		$this->set('nom_evenement', $this->donneeEvenement['Evenement']['nom_evenement']);
-		$this->set('date_debut_evenement', $this->donneeEvenement['Evenement']['date_debut']);
-		$this->set('date_fin_evenement', $this->donneeEvenement['Evenement']['date_fin']);
-		$this->login();
-
+		$this->set('evenement_id', $this->donneeEvenement['Evenement']['evenement_id']);	
+		$this->set('evenement', $this->donneeEvenement['Evenement']);
+		$this->set('categories', $res);
+		// $this->login();
 	}
 
 	public function login() {

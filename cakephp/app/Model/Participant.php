@@ -44,20 +44,12 @@ class Participant extends AppModel{
 											'rule' => array('notEmpty'),
 											'message' => "Vous devez spécifier le prénom pour ce participant.",
 											),
-								/*'char' => array(
-											'rule' => array('char'),
-											'message' => "Le prénom du participant ne peut contenir que des caractères.",
-											),*/
 								),
 				'nom_participant' => array(
 								'required' => array(
 											'rule' => array('notEmpty'),
 											'message' => "Vous devez spécifier le nom du participant.",
 											),
-								/*'char' => array(
-											'rule' => array('char'),
-											'message' => "Le nom du participant ne peut contenir que des caractères.",
-											),*/
 								),
 				'email_participant' => array(
 								'email' => array(
@@ -95,15 +87,6 @@ class Participant extends AppModel{
 								),
 				);
 	
-	/**
-	 * méthode de vérification : Elle vérifie si check est composé de caractères (caractères accentués compris).
-	 * /!\ Cette méthode est une copie du modèle Organisateur.
-	 */
-	public function char($check){
-		//return preg_match('#^[^\d[:space:][:punct:]_-]*$#', $check); tester si alpha prends les caractères accentués.
-		return preg_match('#^[[:alpha:]]*$#', $check);
-	}
-
 	public function beforeSave($options = array('')) {
 	    if (isset($this->data[$this->alias]['mot_de_passe'])) {
 		   $this->data[$this->alias]['mot_de_passe'] = AuthComponent::password($this->data[$this->alias]['mot_de_passe']);
