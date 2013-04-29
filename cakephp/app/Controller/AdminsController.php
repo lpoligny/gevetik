@@ -31,6 +31,7 @@
 			$this -> Auth -> logout();
 		}
 
+		// Interface de gestion des organisateurs pour un évènement
 		function modifier_orga_evenement(){
 			if($this -> request -> is('post')){
 				$evenement_id = $this -> request -> data['select_evt'];
@@ -56,6 +57,7 @@
 			}
 		}
 
+		// Interface de création d'un nouvel évènement
 		function nouvel_evenement(){
 			$this -> loadModel('Organisateur');
 
@@ -68,6 +70,7 @@
 			$this -> set('infos',$data);
 		}
 
+		// Sauvegarde du nouvel évènement
 		function confirmer_ajout_conf(){
 			if($this -> request -> is('post')){
 				$sent = $this -> request -> data['ajout_conf'];
